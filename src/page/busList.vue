@@ -16,7 +16,7 @@
     </header>
 
     <ul class="routes">
-      <li class="routeItem" v-for="(v,i) in transits" :key="i">
+      <li class="routeItem" v-for="(v,i) in transits" :key="i" @click="goBusMap(i)">
         <div class="durations">
           <span>{{v.duration|formatTime}}</span>
           <span>步行{{v.walking_distance}}m</span>
@@ -92,6 +92,7 @@ export default {
       };
       this.focusIndex = i;
       apis.getRoutesInfo(params, function(res) {
+        console.log(res);
         self.showRoutes(res.data.route.transits);
       });
     },
@@ -100,6 +101,20 @@ export default {
     },
     goBack() {
       this.$router.back();
+    },
+    // 点击跳转到公交地图页面
+    goBusMap() {
+      var self = this;
+      this.$router.push({
+        path: "/busMap",
+        query: {
+          name: encodeURI(this.options.name),
+          address: encodeURI(this.options.address),
+          location: this.options.location,
+          id: this.options.id,
+          typeIndex: this.focusIndex
+        }
+      });
     },
     //格式化公交换乘方案
     formatBus(v) {

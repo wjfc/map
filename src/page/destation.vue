@@ -1,9 +1,6 @@
 <template>
   <div class="destation">
-    <header>
-      <div class="backArrow icon-wj_ic_back" @click="goBack()"></div>
-      <p>{{options.name}}</p>
-    </header>
+    <basicHeader :desName="options.name"></basicHeader>
     <mapComponent class="mapComponent2" ref="mapObj" :dataFLag="false"></mapComponent>
     <div class="tips">
       <div class="tips-l">
@@ -19,6 +16,7 @@
 </template>
 
 <script>
+import basicHeader from "@/components/basicHeader"; //通用头部组件
 import mapComponent from "@/components/mapComponent"; //地图组件
 export default {
   name: "destaion",
@@ -38,13 +36,11 @@ export default {
       id: this.$route.query.id
     };
     setTimeout(function() {
-      self.$refs.mapObj.addMark(self.$route.query.location);
+      // self.$refs.mapObj.addMark(self.$route.query.location);
+      self.addMark(self.$route.query.location);
     }, 500);
   },
   methods: {
-    goBack() {
-      this.$router.back();
-    },
     busList() {
       var self = this;
       this.$router.push({
@@ -56,10 +52,32 @@ export default {
           id: this.options.id
         }
       });
+    },
+    addMark(location) {
+      var self = this;
+      var endIcon = new AMap.Icon({
+        size: new AMap.Size(29, 35), // 图标尺寸
+        image: "../../static/images/mark0.png", // Icon的图像
+        imageSize: new AMap.Size(29, 35) // 根据所设置的大小拉伸或压缩图片
+      });
+      var marker = new AMap.Marker({
+        position: new AMap.LngLat(
+          location.split(",")[0],
+          location.split(",")[1]
+        ),
+        offset: new AMap.Pixel(-10, -10),
+        icon: endIcon,
+        title: "010",
+        zoom: 13,
+        map: this.map
+      });
+      this.$refs.mapObj.map.add([marker]);
+      this.$refs.mapObj.map.setFitView([marker]);
     }
   },
   computed: {},
   components: {
+    basicHeader: basicHeader,
     mapComponent: mapComponent
   }
 };
@@ -67,32 +85,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-.destation {
-  width: 100%;
-  height: 100%;
-}
-.destation header {
-  position: relative;
-  width: 100%;
-  height: 88px;
-  background: #37cabe;
-  color: #fff;
-}
-.destation header p {
-  width: 100%;
-  height: 88px;
-  text-align: center;
-  line-height: 88px;
-  font-size: 36px;
-}
-.destation .backArrow {
-  position: absolute;
-  top: 50%;
-  left: 40px;
-  transform: translateY(-50%);
-  font-size: 42px;
-}
-
 .destation .tips {
   position: absolute;
   display: flex;

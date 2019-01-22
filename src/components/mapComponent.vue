@@ -75,27 +75,6 @@ export default {
             false
           );
       });
-    },
-    addMark(location) {
-      var self = this;
-      var endIcon = new AMap.Icon({
-        size: new AMap.Size(29, 35), // 图标尺寸
-        image: "../../static/images/mark0.png", // Icon的图像
-        imageSize: new AMap.Size(29, 35) // 根据所设置的大小拉伸或压缩图片
-      });
-      var marker = new AMap.Marker({
-        position: new AMap.LngLat(
-          location.split(",")[0],
-          location.split(",")[1]
-        ),
-        offset: new AMap.Pixel(-10, -10),
-        icon: endIcon,
-        title: "010",
-        zoom: 13,
-        map: this.map
-      });
-      this.map.add([marker]);
-      this.map.setFitView([marker]);
     }
   }
 };
