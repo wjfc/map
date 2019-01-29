@@ -192,7 +192,7 @@ export default {
               outlineColor: "#ffeeee",
               borderWeight: 2,
               strokeWeight: 5,
-              strokeColor: "grey",
+              strokeColor: "#37cabe",
               lineJoin: "round",
               strokeStyle: "dashed",
               zIndex: 10
@@ -214,7 +214,7 @@ export default {
             path: busPath,
             isOutline: true,
             outlineColor: "white",
-            strokeColor: "#09f", //线颜色
+            strokeColor: "#37cabe", //线颜色
             strokeOpacity: 0.5, //线透明度
             lineJoin: "round",
             strokeWeight: 6, //线宽

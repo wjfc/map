@@ -89,7 +89,7 @@
         </div>
       </div>
       <!-- 目的地 -->
-      <div class="detanceline baseline solid">
+      <div class="detanceline baseline solid" v-show="transits.length>0">
         <div class="bustDetail-destance leftIcon red">{{options.name}}</div>
       </div>
     </div>
@@ -103,7 +103,7 @@ import basicHeader from "@/components/basicHeader"; //通用头部组件
 import basicList from "@/components/basicList";
 import mapPreview from "@/components/mapPreview";
 import transcode from "@/components/transCode";
-import { swiper, swiperSlide } from "vue-awesome-swiper";
+import { swiper, swiperSlide } from "vue-awesome-swiper"; //swiper轮播效果
 
 export default {
   name: "busDetail",
@@ -160,6 +160,7 @@ export default {
       };
       apis.getRoutesInfo(params, function(res) {
         self.transits = res.data.route.transits;
+        // swiper 滑动到指定位置。
         self.swiper.slideTo(self.activeIndex, 0, function() {});
         self.getMysegments();
       });

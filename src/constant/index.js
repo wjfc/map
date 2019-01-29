@@ -1,4 +1,4 @@
-if (process.env.NODE_ENV == "development") {
+if (process.env.NODE_ENV == "development" || true) {
   var obj = {
     adcode: "320100", //南京区域code
     adname: "南京",

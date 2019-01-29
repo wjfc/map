@@ -46,7 +46,7 @@ body {
 }
 .swiper-pagination-bullet-active {
   opacity: 1;
-  background: #37cabe;
+  background: #37cabe !important;
 }
 .swiper-slide {
   width: 100% !important;
