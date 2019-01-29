@@ -1,5 +1,6 @@
 <template>
   <div class="busDetail">
+    <transcode class="transCode"></transcode>
     <div class="busDetail-header">
       <basicHeader :desName="msg"></basicHeader>
       <div class="bus-swiper" v-show="transits.length>0">
@@ -11,6 +12,7 @@
           <!-- slides -->
           <swiper-slide v-for="(v,i) in transits" :key="i">
             <div class="listbox">
+              <mapPreview class="mapPreview"></mapPreview>
               <basicList :v="v"></basicList>
             </div>
           </swiper-slide>
@@ -23,17 +25,20 @@
       <div class="busDetail-list" v-for="(v,i) in mysegments" :key="i">
         <div class="section">
           <div class="walking">
-            <div v-html="startName(v,i)" v-if="startName(v,i)" class="myposition"></div>
+            <div v-html="startName(v,i)" v-if="startName(v,i)" class="myposition leftIcon green"></div>
             <!-- 步行距离 -->
-            <div class="walking-distance" v-if="v.walking&&v.walking.distance>50">
+            <div class="walking-distance baseline dashed" v-if="v.walking">
               <span class="icon-wj_ic_onfoot"></span>
               <span>{{v|formatDistance}}</span>
             </div>
             <!-- 步行距离 -->
           </div>
-          <div class="busline" v-if="departure_stop(v,i)">
+          <div class="busline baseline solid" v-if="departure_stop(v,i)">
             <!-- 公交车起点 -->
-            <div class="bus-departure_stop">
+            <div
+              class="bus-departure_stop leftIcon"
+              :class="{'green':showSame(v,i)==='上车','transform':showSame(v,i)!=='上车'}"
+            >
               <span>{{departure_stop(v,i)}}</span>
               <span>{{showSame(v,i)}}</span>
             </div>
@@ -42,7 +47,7 @@
             <div class="bus-via_stops" v-if="departure_stop(v,i)">
               <!-- 车辆到站信息 -->
               <div class="bus-time">
-                <h3>222路</h3>
+                <h3>{{v.buslines[0].name}}</h3>
                 <div class="nearestBus">
                   <span>最近一辆</span>
                   <span>1</span>
@@ -83,6 +88,10 @@
           </div>
         </div>
       </div>
+      <!-- 目的地 -->
+      <div class="detanceline baseline solid">
+        <div class="bustDetail-destance leftIcon red">{{options.name}}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -92,6 +101,8 @@ import apis from "@/apis/index.js";
 import baseConstant from "@/constant/index.js";
 import basicHeader from "@/components/basicHeader"; //通用头部组件
 import basicList from "@/components/basicList";
+import mapPreview from "@/components/mapPreview";
+import transcode from "@/components/transCode";
 import { swiper, swiperSlide } from "vue-awesome-swiper";
 
 export default {
@@ -166,7 +177,8 @@ export default {
 
       segments.forEach((v, i) => {
         var obj = {};
-        if (v.walking.steps) {
+        // 大于50米的才算步行逻辑
+        if (v.walking.steps && v.walking.distance >= 50) {
           // 步行
           obj.walking = v.walking;
         }
@@ -179,6 +191,7 @@ export default {
       });
       this.showFlags = showFlag;
       this.mysegments = mysegments;
+      console.log(this.mysegments.length);
     },
     // 第一步判断
     startName(v, i) {
@@ -230,7 +243,9 @@ export default {
     basicHeader,
     swiper,
     swiperSlide,
-    basicList
+    basicList,
+    mapPreview,
+    transcode
   },
   filters: {
     formatDistance(v) {
@@ -244,6 +259,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.transCode {
+  position: fixed;
+  right: 40px;
+  bottom: 127px;
+  z-index: 1001;
+}
 .busDetail-header {
   position: relative;
   width: 100%;
@@ -269,6 +290,11 @@ export default {
   padding-left: 29px;
   box-sizing: border-box;
 }
+.mapPreview {
+  position: absolute;
+  top: 84px;
+  right: 8px;
+}
 /* 详情 */
 .busDetail-content {
   position: absolute;
@@ -284,17 +310,21 @@ export default {
   width: 100%;
 }
 .busDetail-list .walking {
-  box-sizing: border-box;
-  padding-left: 132px;
 }
 .walking .myposition {
   font-size: 30px;
   font-weight: bold;
+  box-sizing: border-box;
+  padding-left: 132px;
 }
 .walking-distance {
+  position: relative;
   display: flex;
-  margin: 50px 0;
+  padding: 50px 0;
+  box-sizing: border-box;
+  padding-left: 132px;
 }
+
 .walking-distance span:first-child {
   margin-right: 20px;
   color: #37cabe;
@@ -388,4 +418,71 @@ export default {
   font-weight: 500;
 }
 /* 详情 */
+/* 目的地 */
+.bustDetail-destance {
+  box-sizing: border-box;
+  padding-left: 132px;
+  font-size: 30px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  color: #212121;
+  font-weight: bold;
+}
+/* 左边图标样式 */
+.leftIcon {
+  position: relative;
+}
+.leftIcon::before {
+  position: absolute;
+  left: 82px;
+  top: 50%;
+  transform: translateY(-50%);
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border-radius: 50%;
+  z-index: 1000;
+}
+.leftIcon.red::before {
+  border: 4px solid #fd3232;
+}
+.leftIcon.green::before {
+  border: 4px solid #37cabe;
+}
+.leftIcon.transform::before {
+  content: "";
+  left: 72px;
+  width: 44px;
+  height: 44px;
+  background: url("../../static/images/transfrom.png") no-repeat;
+  background-size: 100% 100%;
+}
+/* 目的地 */
+
+/* 最左边线条样式 */
+.baseline {
+  position: relative;
+}
+.baseline::before {
+  content: "";
+  position: absolute;
+  left: 94px;
+  top: 0;
+  height: 100%;
+  z-index: 999;
+}
+.baseline.dashed::before {
+  border: 2px dashed #37cabe;
+}
+
+.baseline.solid::before {
+  /* border: 2px solid #37cabe; */
+  width: 4px;
+  background: #37cabe;
+}
+.baseline.detanceline::before {
+  height: 50%;
+}
+/* 最左边线条样式 */
 </style>
