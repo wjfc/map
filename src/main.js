@@ -4,6 +4,12 @@ import Vue from "vue";
 import store from "@/store/index.js";
 import App from "./App";
 import router from "./router";
+// 引入swiper组件
+import VueAwesomeSwiper from "vue-awesome-swiper";
+// require styles
+import "swiper/dist/css/swiper.css";
+Vue.use(VueAwesomeSwiper /* { default global options } */);
+// 引入swiper组件
 import "../static/css/reset.css"; //css重置或者清除默认样式
 import "lib-flexible/flexible"; //引入rem布局方式
 import "../static/wj_fonts/style.css";

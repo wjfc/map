@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { mapMutations } from "vuex";
 import baseConstant from "@/constant/index.js";
 export default {
   name: "mapApp",
@@ -17,10 +18,10 @@ export default {
   },
   mounted() {
     this.mapInit();
-    //console.log(store);
   },
   props: ["dataFLag"],
   methods: {
+    ...mapMutations(["changeNowLocation"]),
     mapInit() {
       this.map = new AMap.Map("mapApp", {
         zoom: 13,
@@ -58,7 +59,8 @@ export default {
           // 需要保存位置信息
           var posX = data.position.getLng();
           var poxY = data.position.getLat();
-          self.$store.commit("changeNowLocation", posX + "," + poxY);
+          //self.$store.commit("changeNowLocation", posX + "," + poxY);
+          self.changeNowLocation(posX + "," + poxY);
         }
         function onError(data) {
           console.log(data);

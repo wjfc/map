@@ -39,4 +39,16 @@ body {
   display: none;
 }
 /* 公共样式解决插入html css失效 */
+/* swiper样式 */
+.swiper-container {
+  width: 100%;
+  height: 100%;
+}
+.swiper-pagination-bullet-active {
+  opacity: 1;
+  background: #37cabe;
+}
+.swiper-slide {
+  width: 100% !important;
+}
 </style>

@@ -7,7 +7,7 @@
       </div>
       <ul class="strategy">
         <li
-          :class="{'focus':i===focusIndex}"
+          :class="{'focus':i===typeIndex}"
           v-for="(item,i) in strategy"
           :key="i"
           @click="getRoutes(i)"
@@ -15,36 +15,25 @@
       </ul>
     </header>
 
-    <ul class="routes">
-      <li class="routeItem" v-for="(v,i) in transits" :key="i" @click="goBusMap(i)">
-        <div class="durations">
-          <span>{{v.duration|formatTime}}</span>
-          <span>步行{{v.walking_distance}}m</span>
-        </div>
-        <div class="bus" id="bus-normal" v-html="formatBus(v.segments)"></div>
-        <div class="info">
-          <span>{{v.segments|formatStations}}</span>
-          <span>.</span>
-          <span>{{v.cost}}元</span>
-          <span>.</span>
-          <span>{{v.segments|formatDeparture_stop}}</span>
-        </div>
-      </li>
-    </ul>
+    <div class="routes">
+      <div v-for="(v,i) in transits" :key="i" @click="goBusMap(i)" class="listbox">
+        <basicList :v="v"></basicList>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import apis from "@/apis/index.js";
 import baseConstant from "@/constant/index.js";
-
+import basicList from "@/components/basicList";
 export default {
   name: "roadInfo",
   data() {
     return {
       msg: "路线详情",
       options: {},
-      focusIndex: 0,
+      typeIndex: 0,
       strategy: [
         {
           name: "推荐",
@@ -73,7 +62,10 @@ export default {
       location: this.$route.query.location,
       id: this.$route.query.id
     };
-    this.getRoutes(this.focusIndex);
+    this.getRoutes(this.typeIndex);
+  },
+  components: {
+    basicList
   },
   methods: {
     getRoutes(i) {
@@ -90,9 +82,8 @@ export default {
         city: baseConstant.adname,
         strategy: this.strategy[i].type
       };
-      this.focusIndex = i;
+      this.typeIndex = i;
       apis.getRoutesInfo(params, function(res) {
-        console.log(res);
         self.showRoutes(res.data.route.transits);
       });
     },
@@ -103,7 +94,7 @@ export default {
       this.$router.back();
     },
     // 点击跳转到公交地图页面
-    goBusMap() {
+    goBusMap(i) {
       var self = this;
       this.$router.push({
         path: "/busMap",
@@ -112,58 +103,13 @@ export default {
           address: encodeURI(this.options.address),
           location: this.options.location,
           id: this.options.id,
-          typeIndex: this.focusIndex
+          type: this.strategy[this.typeIndex].type,
+          focusIndex: i
         }
       });
-    },
-    //格式化公交换乘方案
-    formatBus(v) {
-      var segments = v;
-      var len = segments.length;
-      var str = "";
-      segments.forEach((ele, i) => {
-        if (ele.bus.buslines.length > 0) {
-          var index = ele.bus.buslines[0].name.indexOf("(");
-          name =
-            index > -1
-              ? ele.bus.buslines[0].name.substr(0, index)
-              : ele.bus.buslines[0].name;
-          var span =
-            i == len - 1
-              ? "<span>" + name + "</span>"
-              : "<span>" + name + "</span><i class='icon-wj_ic_diraction'></i>";
-          str += span;
-        }
-      });
-      return str;
     }
   },
-  filters: {
-    // 格式化消耗时间
-    formatTime(v) {
-      var mins = Math.ceil(v / 60);
-      var hour = Math.floor(mins / 60);
-      hour = hour > 0 ? hour + "小时" : "";
-      var minute = (mins % 60) + "分钟";
-      return hour + minute;
-    },
-    // 格式化总站数量
-    formatStations(v) {
-      var segments = v;
-      var stations = 0;
-      segments.forEach((ele, i) => {
-        if (ele.bus.buslines.length > 0) {
-          stations = stations + (parseInt(ele.bus.buslines[0].via_num) + 2);
-        }
-      });
-      return stations + "站";
-    },
-    // 起点站
-    formatDeparture_stop(v) {
-      var segments = v;
-      return segments[0].bus.buslines[0].departure_stop.name + "上车";
-    }
-  }
+  filters: {}
 };
 </script>
 
@@ -241,49 +187,10 @@ export default {
   overflow: scroll;
   -webkit-overflow-scrolling: touch;
 }
-.routes li {
+.routes .listbox {
   width: 100%;
   height: 250px;
-  display: flex;
-  flex-direction: column;
-  padding: 49px 0;
+  padding: 44px 0;
   box-sizing: border-box;
-}
-.routes li .durations {
-}
-.routes li .durations span:first-child {
-  font-size: 36px;
-  color: #212121;
-  font-weight: bold;
-  margin-right: 20px;
-}
-.routes li .durations span:last-child {
-  font-size: 28px;
-  font-weight: 400;
-  color: #888888;
-}
-.routes li .bus {
-  margin-top: 23px;
-  margin-bottom: 19px;
-}
-.routes li .bus span {
-  display: inline-block;
-  font-size: 28px;
-  line-height: 28px;
-  color: #212121;
-  padding: 12px 22px;
-  box-sizing: border-box;
-  border: 2px solid rgba(33, 33, 33, 1);
-  border-radius: 8px;
-}
-.routes li .bus i:last-child {
-  display: none;
-}
-.routes li .info {
-  font-size: 26px;
-  color: #888888;
-}
-.routes li .info span:last-child {
-  color: #37cabe;
 }
 </style>

@@ -21,7 +21,7 @@
               <div class="bus" id="bus-normal" v-html="formatBus(v.segments)"></div>
               <p>步行{{v.walking_distance}}m</p>
             </div>
-            <div class="info-r">
+            <div class="info-r" @click="goBusDetail(i)">
               <img src="../../static/images/infoBg.png" alt>
             </div>
           </li>
@@ -42,26 +42,12 @@ export default {
     return {
       msg: "bus地图",
       options: {},
+      origin: "", //七点
+      destination: "", //终点
       focusIndex: 0,
       styleObject: {},
-      strategy: [
-        {
-          name: "推荐",
-          type: 1
-        },
-        {
-          name: "步行少",
-          type: 3
-        },
-        {
-          name: "少换乘",
-          type: 2
-        },
-        {
-          name: "不坐地铁",
-          type: 5
-        }
-      ],
+      walkLines: [],
+      busLines: [],
       transits: [] //高德返回路线数组
     };
   },
@@ -73,9 +59,12 @@ export default {
       address: decodeURI(this.$route.query.address),
       location: this.$route.query.location,
       id: this.$route.query.id,
-      typeIndex: 0
+      type: this.$route.query.type,
+      focusIndex: this.$route.query.focusIndex
     };
-    this.getRoutes(this.options.typeIndex);
+    this.focusIndex = Number(this.$route.query.focusIndex);
+    this.destination = this.$route.query.location; //终点
+    this.getRoutes(this.options.type);
   },
   methods: {
     getRoutes(i) {
@@ -85,12 +74,13 @@ export default {
       } else {
         var origin = this.$store.state.location_now;
       }
+      this.origin = origin;
       var params = {
         origin: origin, //当前位置定位
         destination: this.options.location, //目的地位置定位
         key: baseConstant.key,
         city: baseConstant.adname,
-        strategy: this.strategy[i].type
+        strategy: this.options.type
       };
       apis.getRoutesInfo(params, function(res) {
         self.showRoutes(res.data.route.transits);
@@ -101,6 +91,9 @@ export default {
       this.styleObject = {
         width: arr.length * 100 + "%"
       };
+      this.drawStartAndEnd(); //绘制起点和终点
+      this.drawbusLine(arr[this.focusIndex]);
+      this.switchItem(this.focusIndex);
     },
     switchItem(i) {
       // 动画效果
@@ -111,6 +104,127 @@ export default {
         transform: "translate3d(" + transformLeft + ", 0, 0)"
       };
       // 动画效果
+      this.drawbusLine(this.transits[i]); //画线
+    },
+    // 添加点方法
+    addMark(location) {
+      var self = this;
+      var endIcon = new AMap.Icon({
+        size: new AMap.Size(29, 35), // 图标尺寸
+        image: "../../static/images/mark0.png", // Icon的图像
+        imageSize: new AMap.Size(29, 35) // 根据所设置的大小拉伸或压缩图片
+      });
+      var marker = new AMap.Marker({
+        position: new AMap.LngLat(
+          location.split(",")[0],
+          location.split(",")[1]
+        ),
+        offset: new AMap.Pixel(-10, -10),
+        icon: endIcon,
+        title: "010",
+        zoom: 13,
+        map: this.map
+      });
+      this.$refs.mapObj.map.add([marker]);
+      this.$refs.mapObj.map.setFitView([marker]);
+    },
+    // 绘制路线
+    drawbusLine(obj) {
+      try {
+        //先清除 已绘制的线。
+        var self = this;
+        this.walkLines.forEach((v, i) => {
+          self.$refs.mapObj.map.remove(v);
+        });
+        this.walkLines.forEach((v, i) => {
+          self.$refs.mapObj.map.remove(v);
+        });
+        self.$refs.mapObj.map.remove(v);
+      } catch (error) {}
+
+      //绘制乘车的路线
+      this.getpolyline(obj);
+    },
+    // 绘制起点和终点
+    drawStartAndEnd(obj) {
+      // 绘制起点
+      var startPosition = new AMap.Marker({
+        map: this.$refs.mapObj.map,
+        position: [this.origin.split(",")[0], this.origin.split(",")[1]], //基点位置
+        icon: "../../static/images/startIcon.png",
+        zIndex: 10
+      });
+      // 绘制终点
+      var endPosition = new AMap.Marker({
+        map: this.$refs.mapObj.map,
+        position: [
+          this.destination.split(",")[0],
+          this.destination.split(",")[1]
+        ], //基点位置
+        icon: "../../static/images/endIcon.png",
+        zIndex: 10
+      });
+      // this.$refs.mapObj.map.setFitView();
+    },
+    // /绘制乘车的路线
+    getpolyline(obj) {
+      var self = this;
+      var segments = obj.segments;
+      segments.forEach((v, i) => {
+        // 绘制步行
+        if (v.walking) {
+          var walkPath = [];
+          var walkLine = null;
+          if (v.walking.steps) {
+            for (var j = 0; j < v.walking.steps.length; j++) {
+              var step = v.walking.steps[j];
+              var polylineArray = step.polyline.split(";");
+              for (var k = 0; k < polylineArray.length; k++) {
+                walkPath.push([
+                  polylineArray[k].split(",")[0],
+                  polylineArray[k].split(",")[1]
+                ]);
+              }
+            }
+            walkLine = new AMap.Polyline({
+              path: walkPath,
+              isOutline: true,
+              outlineColor: "#ffeeee",
+              borderWeight: 2,
+              strokeWeight: 5,
+              strokeColor: "grey",
+              lineJoin: "round",
+              strokeStyle: "dashed",
+              zIndex: 10
+            });
+            self.walkLines.push(walkLine);
+            self.$refs.mapObj.map.add(walkLine);
+            self.$refs.mapObj.map.setFitView([walkLine]);
+          }
+        }
+        if (v.bus.buslines.length > 0) {
+          var polyline = v.bus.buslines[0].polyline.split(";");
+          var busPath = [];
+          var busLine = null;
+          polyline.forEach((v, i) => {
+            busPath.push([v.split(",")[0], v.split(",")[1]]);
+          });
+
+          busLine = new AMap.Polyline({
+            path: busPath,
+            isOutline: true,
+            outlineColor: "white",
+            strokeColor: "#09f", //线颜色
+            strokeOpacity: 0.5, //线透明度
+            lineJoin: "round",
+            strokeWeight: 6, //线宽
+            zIndex: 9
+          });
+          self.walkLines.push(busLine);
+          self.$refs.mapObj.map.add(busLine);
+          self.$refs.mapObj.map.setFitView([busLine]);
+        }
+      });
     },
     //格式化公交换乘方案
     formatBus(v) {
@@ -132,6 +246,20 @@ export default {
         }
       });
       return str;
+    },
+    // 跳转到公交导航详情页面
+    goBusDetail(i) {
+      this.$router.push({
+        path: "/busDetail",
+        query: {
+          name: encodeURI(this.options.name),
+          address: encodeURI(this.options.address),
+          location: this.options.location,
+          id: this.options.id,
+          type: this.options.type,
+          focusIndex: this.focusIndex
+        }
+      });
     }
   },
   computed: {},
@@ -278,5 +406,9 @@ export default {
   border-radius: 50%;
   box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.2);
   background-size: 100% 100%;
+}
+.amap-icon img {
+  width: 58px !important;
+  height: 70px !important;
 }
 </style>
