@@ -2,7 +2,23 @@
   <div class="busMap-preivew">
     <basicHeader :desName="options.name"></basicHeader>
     <mapComponent class="mapComponent2" ref="mapObj" :dataFLag="false"></mapComponent>
-    <div class="mapPreview"></div>
+    <div class="mapPreview">
+      <swiper
+        :options="swiperOption"
+        ref="mySwiper"
+        @slideChangeTransitionEnd="slideChangeTransitionEnd"
+      >
+        <!-- slides -->
+        <swiper-slide v-for="(v,i) in steps" :key="i">
+          <div class="stepItem">
+            <p v-show="v.desc">{{v.desc}}</p>
+            <p v-show="v.distance">{{v.distance}}</p>
+          </div>
+        </swiper-slide>
+        <div class="swiper-button-prev1 swiper-button icon-wj_ic_left" slot="button-prev"></div>
+        <div class="swiper-button-next1 swiper-button icon-wj_ic_right" slot="button-next"></div>
+      </swiper>
+    </div>
   </div>
 </template>
 
@@ -11,19 +27,32 @@ import apis from "@/apis/index.js";
 import baseConstant from "@/constant/index.js";
 import basicHeader from "@/components/basicHeader"; //通用头部组件
 import mapComponent from "@/components/mapComponent"; //地图组件
+import { swiper, swiperSlide } from "vue-awesome-swiper"; //swiper轮播效果
 export default {
   name: "busMap",
   data() {
     return {
       msg: "bus地图",
       options: {},
+      activeIndex: 0,
+      swiperOption: {
+        // some swiper options/callbacks
+        // 所有的参数同 swiper 官方 api 参数
+        navigation: {
+          nextEl: ".swiper-button-next1",
+          prevEl: ".swiper-button-prev1"
+        },
+        activeIndex: 0
+      },
       origin: "", //七点
       destination: "", //终点
       styleObject: {},
       walkLines: [],
       busLines: [],
       transits: [], //高德返回路线数组
-      mysegments: []
+      mysegments: [],
+      stepIndex: 0, //按步执行的索引,
+      steps: []
     };
   },
   created() {},
@@ -88,7 +117,7 @@ export default {
         mysegments.push(obj);
       });
       this.mysegments = mysegments;
-      console.log(this.mysegments);
+      this.getSteps(this.mysegments);
     },
     // 添加点方法
     addMark(location) {
@@ -148,7 +177,6 @@ export default {
         icon: "../../static/images/endIcon.png",
         zIndex: 10
       });
-      // this.$refs.mapObj.map.setFitView();
     },
     // /绘制乘车的路线
     getpolyline(obj) {
@@ -183,7 +211,7 @@ export default {
             });
             self.walkLines.push(walkLine);
             self.$refs.mapObj.map.add(walkLine);
-            self.$refs.mapObj.map.setFitView([walkLine]);
+            // self.$refs.mapObj.map.setFitView([walkLine]);
           }
         }
         if (v.bus.buslines.length > 0) {
@@ -206,15 +234,99 @@ export default {
           });
           self.walkLines.push(busLine);
           self.$refs.mapObj.map.add(busLine);
-          self.$refs.mapObj.map.setFitView([busLine]);
+          // self.$refs.mapObj.map.setFitView([busLine]);
+        }
+        self.$refs.mapObj.map.setFitView();
+      });
+    },
+    // 按步执行
+    getSteps(arr) {
+      console.log(arr);
+      var self = this;
+      var steps = [];
+      // 开始出发
+      steps.push({
+        desc: "从我的位置出发",
+        distance: ""
+      });
+      if (self.options.point == "start") {
+        self.stepIndex = 0;
+      }
+      arr.forEach((v, i) => {
+        if (v.walking) {
+          if (v.buslines) {
+            var s = self.showSame(v, i);
+            if (s) {
+              steps.push({
+                desc: "站内换乘" + v.walking.distance + "m",
+                distance: ""
+              });
+            } else {
+              steps.push({
+                desc: "步行到" + v.buslines[0].departure_stop.name,
+                distance: v.walking.distance + "m"
+              });
+            }
+          } else {
+            steps.push({
+              desc: "步行" + v.walking.distance + "m",
+              distance: ""
+            });
+          }
+          if (self.options.point == "walking" && this.options.index == i) {
+            self.stepIndex = steps.length - 1;
+          }
+        }
+        if (v.buslines) {
+          steps.push({
+            desc: v.buslines[0].name,
+            distance:
+              "从" +
+              v.buslines[0].departure_stop.name +
+              "到" +
+              v.buslines[0].arrival_stop.name
+          });
+          if (self.options.point == "busline" && this.options.index == i) {
+            self.stepIndex = steps.length - 1;
+          }
         }
       });
+      steps.push({
+        desc: "到达" + this.options.name,
+        distance: ""
+      });
+      if (self.options.point == "end") {
+        self.stepIndex = steps.length - 1;
+      }
+      self.swiper.slideTo(self.stepIndex, 0, function() {});
+      this.steps = steps;
+    },
+    // 是否展示同站换乘
+    showSame(v, i) {
+      if (i == 0) {
+        return "";
+      }
+      var s =
+        v.buslines[0].departure_stop.name ==
+        this.mysegments[i - 1].buslines[0].arrival_stop.name
+          ? "同站换乘"
+          : "";
+      return s;
+    },
+    slideChangeTransitionEnd() {
+      this.stepIndex = this.swiper.activeIndex;
     }
   },
-  computed: {},
+  computed: {
+    swiper() {
+      return this.$refs.mySwiper.swiper;
+    }
+  },
   components: {
     basicHeader: basicHeader,
-    mapComponent: mapComponent
+    mapComponent: mapComponent,
+    swiper,
+    swiperSlide
   },
   filters: {
     // 格式化消耗时间
@@ -243,7 +355,50 @@ export default {
   height: 248px;
   background-color: #fff;
 }
+.stepItem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 100%;
+  width: 80%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 84px 0;
+  box-sizing: border-box;
+}
+.stepItem p:first-child {
+  font-size: 40px;
+  color: #000;
+  line-height: 40px;
+}
+.stepItem p:last-child {
+  font-size: 26px;
+  line-height: 26px;
+  color: #999;
+}
 /* 底部样式结束 */
+/* swiper 左右箭头样式 */
+.swiper-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 40px;
+  color: #000;
+  z-index: 9999;
+}
+.swiper-button-prev1 {
+  left: 40px;
+}
+.swiper-button-next1 {
+  right: 40px;
+}
+.swiper-button-disabled {
+  color: #ccc;
+}
+/* swiper 左右箭头样式结束 */
 
 /* 地图相关 */
 .mapComponent2 {

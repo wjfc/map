@@ -224,6 +224,7 @@ export default {
           self.$refs.mapObj.map.add(busLine);
           self.$refs.mapObj.map.setFitView([busLine]);
         }
+        self.$refs.mapObj.map.setFitView();
       });
     },
     //格式化公交换乘方案

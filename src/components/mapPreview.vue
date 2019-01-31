@@ -18,6 +18,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.previewBtn {
+  width: 190px;
+  height: 107px;
+}
 .previewBtn .btn {
   width: 190px;
   height: 107px;

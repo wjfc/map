@@ -12,7 +12,9 @@
           <!-- slides -->
           <swiper-slide v-for="(v,i) in transits" :key="i">
             <div class="listbox">
-              <mapPreview class="mapPreview"></mapPreview>
+              <div class="mapPreview">
+                <mapPreview></mapPreview>
+              </div>
               <basicList :v="v"></basicList>
             </div>
           </swiper-slide>
@@ -73,7 +75,7 @@
               <div
                 class="bus-stopsNums"
                 :class="{'showFlag':showFlags[i]}"
-                @click="transformFlag(i)"
+                @click.stop="transformFlag(i)"
               >
                 <p>{{v.buslines[0].via_stops.length+2}}站</p>
                 <i class="icon-wj_ic_down"></i>
@@ -320,6 +322,7 @@ export default {
 }
 
 .listbox {
+  position: relative;
   width: 100%;
   height: 250px;
   padding: 44px 0;
@@ -329,7 +332,10 @@ export default {
 .mapPreview {
   position: absolute;
   top: 84px;
-  right: 8px;
+  /* right: 8px; */
+  left: 485px;
+  width: 190px;
+  height: 107px;
 }
 /* 详情 */
 .busDetail-content {
