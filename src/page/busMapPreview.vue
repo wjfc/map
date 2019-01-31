@@ -1,0 +1,288 @@
+<template>
+  <div class="busMap-preivew">
+    <basicHeader :desName="options.name"></basicHeader>
+    <mapComponent class="mapComponent2" ref="mapObj" :dataFLag="false"></mapComponent>
+    <div class="mapPreview"></div>
+  </div>
+</template>
+
+<script>
+import apis from "@/apis/index.js";
+import baseConstant from "@/constant/index.js";
+import basicHeader from "@/components/basicHeader"; //通用头部组件
+import mapComponent from "@/components/mapComponent"; //地图组件
+export default {
+  name: "busMap",
+  data() {
+    return {
+      msg: "bus地图",
+      options: {},
+      origin: "", //七点
+      destination: "", //终点
+      styleObject: {},
+      walkLines: [],
+      busLines: [],
+      transits: [], //高德返回路线数组
+      mysegments: []
+    };
+  },
+  created() {},
+  mounted() {
+    var self = this;
+    this.options = {
+      name: decodeURI(this.$route.query.name),
+      address: decodeURI(this.$route.query.address),
+      location: this.$route.query.location,
+      id: this.$route.query.id,
+      type: this.$route.query.type,
+      activeIndex: this.$route.query.activeIndex, //方案
+      index: this.$route.query.index, //方案中的某一步
+      point: this.$route.query.point
+    };
+    //console.log(this.options);
+    this.destination = this.$route.query.location; //终点
+    this.getRoutes(this.options.type);
+  },
+  methods: {
+    getRoutes(i) {
+      var self = this;
+      if (!this.$store.state.location_now) {
+        var origin = localStorage.getItem("location_now");
+      } else {
+        var origin = this.$store.state.location_now;
+      }
+      this.origin = origin;
+      var params = {
+        origin: origin, //当前位置定位
+        destination: this.options.location, //目的地位置定位
+        key: baseConstant.key,
+        city: baseConstant.adname,
+        strategy: this.options.type
+      };
+      apis.getRoutesInfo(params, function(res) {
+        self.showRoutes(res.data.route.transits);
+      });
+    },
+    showRoutes(arr) {
+      this.transits = arr;
+      this.getMysegments();
+      this.drawStartAndEnd(); //绘制起点和终点
+      this.drawbusLine(arr[this.options.activeIndex]);
+    },
+    // 处理高德导航返回的数据。
+    getMysegments() {
+      // 处理高德导航返回的数据。
+      var mysegments = [];
+      var segments = this.transits[this.options.activeIndex].segments;
+      segments.forEach((v, i) => {
+        var obj = {};
+        // 大于50米的才算步行逻辑
+        if (v.walking.steps && v.walking.distance >= 50) {
+          // 步行
+          obj.walking = v.walking;
+        }
+        if (v.bus.buslines.length > 0) {
+          // 根据吴江公交接口做替换
+          obj.buslines = v.bus.buslines;
+        }
+        mysegments.push(obj);
+      });
+      this.mysegments = mysegments;
+      console.log(this.mysegments);
+    },
+    // 添加点方法
+    addMark(location) {
+      var self = this;
+      var endIcon = new AMap.Icon({
+        size: new AMap.Size(29, 35), // 图标尺寸
+        image: "../../static/images/mark0.png", // Icon的图像
+        imageSize: new AMap.Size(29, 35) // 根据所设置的大小拉伸或压缩图片
+      });
+      var marker = new AMap.Marker({
+        position: new AMap.LngLat(
+          location.split(",")[0],
+          location.split(",")[1]
+        ),
+        offset: new AMap.Pixel(-10, -10),
+        icon: endIcon,
+        title: "010",
+        zoom: 13,
+        map: this.map
+      });
+      this.$refs.mapObj.map.add([marker]);
+      this.$refs.mapObj.map.setFitView([marker]);
+    },
+    // 绘制路线
+    drawbusLine(obj) {
+      try {
+        //先清除 已绘制的线。
+        var self = this;
+        this.walkLines.forEach((v, i) => {
+          self.$refs.mapObj.map.remove(v);
+        });
+        this.walkLines.forEach((v, i) => {
+          self.$refs.mapObj.map.remove(v);
+        });
+        self.$refs.mapObj.map.remove(v);
+      } catch (error) {}
+
+      //绘制乘车的路线
+      this.getpolyline(obj);
+    },
+    // 绘制起点和终点
+    drawStartAndEnd(obj) {
+      // 绘制起点
+      var startPosition = new AMap.Marker({
+        map: this.$refs.mapObj.map,
+        position: [this.origin.split(",")[0], this.origin.split(",")[1]], //基点位置
+        icon: "../../static/images/startIcon.png",
+        zIndex: 10
+      });
+      // 绘制终点
+      var endPosition = new AMap.Marker({
+        map: this.$refs.mapObj.map,
+        position: [
+          this.destination.split(",")[0],
+          this.destination.split(",")[1]
+        ], //基点位置
+        icon: "../../static/images/endIcon.png",
+        zIndex: 10
+      });
+      // this.$refs.mapObj.map.setFitView();
+    },
+    // /绘制乘车的路线
+    getpolyline(obj) {
+      var self = this;
+      var segments = obj.segments;
+      segments.forEach((v, i) => {
+        // 绘制步行
+        if (v.walking) {
+          var walkPath = [];
+          var walkLine = null;
+          if (v.walking.steps) {
+            for (var j = 0; j < v.walking.steps.length; j++) {
+              var step = v.walking.steps[j];
+              var polylineArray = step.polyline.split(";");
+              for (var k = 0; k < polylineArray.length; k++) {
+                walkPath.push([
+                  polylineArray[k].split(",")[0],
+                  polylineArray[k].split(",")[1]
+                ]);
+              }
+            }
+            walkLine = new AMap.Polyline({
+              path: walkPath,
+              isOutline: true,
+              outlineColor: "#ffeeee",
+              borderWeight: 2,
+              strokeWeight: 5,
+              strokeColor: "#37cabe",
+              lineJoin: "round",
+              strokeStyle: "dashed",
+              zIndex: 10
+            });
+            self.walkLines.push(walkLine);
+            self.$refs.mapObj.map.add(walkLine);
+            self.$refs.mapObj.map.setFitView([walkLine]);
+          }
+        }
+        if (v.bus.buslines.length > 0) {
+          var polyline = v.bus.buslines[0].polyline.split(";");
+          var busPath = [];
+          var busLine = null;
+          polyline.forEach((v, i) => {
+            busPath.push([v.split(",")[0], v.split(",")[1]]);
+          });
+
+          busLine = new AMap.Polyline({
+            path: busPath,
+            isOutline: true,
+            outlineColor: "white",
+            strokeColor: "#37cabe", //线颜色
+            strokeOpacity: 0.5, //线透明度
+            lineJoin: "round",
+            strokeWeight: 6, //线宽
+            zIndex: 9
+          });
+          self.walkLines.push(busLine);
+          self.$refs.mapObj.map.add(busLine);
+          self.$refs.mapObj.map.setFitView([busLine]);
+        }
+      });
+    }
+  },
+  computed: {},
+  components: {
+    basicHeader: basicHeader,
+    mapComponent: mapComponent
+  },
+  filters: {
+    // 格式化消耗时间
+    formatTime(v) {
+      var mins = Math.ceil(v / 60);
+      var hour = Math.floor(mins / 60);
+      hour = hour > 0 ? hour + "小时" : "";
+      var minute = (mins % 60) + "分钟";
+      return hour + minute;
+    },
+    formatDistance(v) {
+      return parseFloat(v / 1000).toFixed(2) + "km";
+    }
+  }
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+/* 底部样式开始 */
+.mapPreview {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 248px;
+  background-color: #fff;
+}
+/* 底部样式结束 */
+
+/* 地图相关 */
+.mapComponent2 {
+  position: absolute;
+  top: 80px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+/* 更改左下角默认样式  */
+.map {
+  width: 100%;
+  height: 100%;
+}
+/* 更改左下角默认样式 */
+
+.amap-logo,
+.amap-copyright {
+  display: none !important;
+}
+.mapComponent2 .amap-geolocation-con,
+.mapComponent2 .amap-toolbar {
+  bottom: 278px !important;
+}
+.amap-touch-toolbar .amap-zoomcontrol {
+  bottom: 0 !important;
+}
+.amap-geolocation-con .amap-geo {
+  background: url("../../static/images/target2.png") 50% 50% no-repeat;
+  background-color: #fff;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.2);
+  background-size: 100% 100%;
+}
+.amap-icon img {
+  width: 58px !important;
+  height: 70px !important;
+}
+</style>

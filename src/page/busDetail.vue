@@ -25,15 +25,28 @@
       <div class="busDetail-list" v-for="(v,i) in mysegments" :key="i">
         <div class="section">
           <div class="walking">
-            <div v-html="startName(v,i)" v-if="startName(v,i)" class="myposition leftIcon green"></div>
+            <div
+              v-html="startName(v,i)"
+              v-if="startName(v,i)"
+              class="myposition leftIcon green"
+              @click="goBusMapPreview('','start')"
+            ></div>
             <!-- 步行距离 -->
-            <div class="walking-distance baseline dashed" v-if="v.walking">
+            <div
+              class="walking-distance baseline dashed"
+              v-if="v.walking"
+              @click="goBusMapPreview(i,'walking')"
+            >
               <span class="icon-wj_ic_onfoot"></span>
               <span>{{v|formatDistance}}</span>
             </div>
             <!-- 步行距离 -->
           </div>
-          <div class="busline baseline solid" v-if="departure_stop(v,i)">
+          <div
+            class="busline baseline solid"
+            v-if="departure_stop(v,i)"
+            @click="goBusMapPreview(i,'busline')"
+          >
             <!-- 公交车起点 -->
             <div
               class="bus-departure_stop leftIcon"
@@ -89,7 +102,11 @@
         </div>
       </div>
       <!-- 目的地 -->
-      <div class="detanceline baseline solid" v-show="transits.length>0">
+      <div
+        class="detanceline baseline solid"
+        v-show="transits.length>0"
+        @click="goBusMapPreview('','end')"
+      >
         <div class="bustDetail-destance leftIcon red">{{options.name}}</div>
       </div>
     </div>
@@ -192,7 +209,6 @@ export default {
       });
       this.showFlags = showFlag;
       this.mysegments = mysegments;
-      console.log(this.mysegments.length);
     },
     // 第一步判断
     startName(v, i) {
@@ -232,6 +248,25 @@ export default {
     // 切换箭头展示列表
     transformFlag(i) {
       this.$set(this.showFlags, i, !this.showFlags[i]);
+    },
+    // 跳转到公交地图预览详情页面
+    goBusMapPreview(i, point) {
+      // i，当前索引；point，起点,步行，公交，终点;
+
+      var self = this;
+      this.$router.push({
+        path: "/busMapPreview",
+        query: {
+          name: encodeURI(this.options.name),
+          address: encodeURI(this.options.address),
+          location: this.options.location,
+          id: this.options.id,
+          type: this.options.type,
+          activeIndex: this.activeIndex,
+          index: i,
+          point: point
+        }
+      });
     }
   },
   computed: {
