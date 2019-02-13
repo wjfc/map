@@ -6,6 +6,7 @@ import Destation from "@/page/destation";
 import BusMap from "@/page/busMap";
 import BusDetail from "@/page/busDetail";
 import BusMapPreiview from "@/page/busMapPreview";
+import Notice from "@/page/notice";
 
 Vue.use(Router);
 
@@ -41,6 +42,11 @@ export default new Router({
       path: "/busMapPreview",
       name: "",
       component: BusMapPreiview
+    },
+    {
+      path: "/notice",
+      name: "",
+      component: Notice
     }
   ]
 });

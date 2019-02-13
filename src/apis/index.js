@@ -20,6 +20,9 @@ var searchByKeyword = function(params, callback) {
     })
     .then(function(res) {
       callback(res);
+    })
+    .catch(function(error){
+      callback(error);
     });
 };
 export default {

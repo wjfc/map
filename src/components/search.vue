@@ -1,5 +1,8 @@
 <template>
   <div class="searchHeader">
+    <div class="noSearchList" v-if="nosearch">
+      <img src="../../static/images/nosearch.png" alt>
+    </div>
     <div class="searchBox">
       <div class="searchIcon icon-wj_ic_search"></div>
       <form id="myform" action onsubmit="return false;">
@@ -43,7 +46,8 @@ export default {
       historyList: [], //展示的列表
       searchStorage: [], //保存在本地的历史记录
       clearMsg: "取消",
-      showList: true //展示列表flag
+      showList: true, //展示列表flag,
+      nosearch: false
     };
   },
   created() {
@@ -58,6 +62,7 @@ export default {
   methods: {
     submitSearch(e) {
       //表单提交
+      this.nosearch = false;
       var self = this;
       var params = {
         key: baseConstant.key,
@@ -70,6 +75,10 @@ export default {
       apis.searchByKeyword(params, function(res) {
         self.historyList = res.data.tips;
         self.clearMsg = "取消";
+        if (self.historyList.length < 1 && self.searchContent) {
+          // 显示未搜索到结果
+          self.nosearch = true;
+        }
       });
     },
     // 输入框获得焦点逻辑
@@ -77,6 +86,7 @@ export default {
       this.showList = true;
       if (this.searchContent == "") {
         // 输入框为空时，查询历史记录展示
+        this.nosearch = false;
         this.historyList = this.searchStorage;
         this.clearMsg = "清空全部历史记录";
       }
@@ -143,6 +153,23 @@ export default {
   padding-top: 14px;
   background: #37cabe;
   box-sizing: border-box;
+}
+.noSearchList {
+  position: absolute;
+  width: 100%;
+  height: 1256px;
+  top: 88px;
+  bottom: 0;
+  background: #fff;
+  z-index: 99999;
+}
+.noSearchList img {
+  position: absolute;
+  top: 288px;
+  left: 50%;
+  transform: translate(-50%);
+  width: 280px;
+  height: 280px;
 }
 .searchHeader .btn {
   position: absolute;

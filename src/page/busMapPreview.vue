@@ -370,9 +370,9 @@ export default {
   box-sizing: border-box;
 }
 .stepItem p:first-child {
-  font-size: 40px;
+  font-size: 38px;
   color: #000;
-  line-height: 40px;
+  line-height: 38px;
 }
 .stepItem p:last-child {
   font-size: 26px;

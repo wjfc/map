@@ -1,6 +1,9 @@
 <template>
   <div class="mapBox">
     <div class="map" id="mapApp"></div>
+    <div class="mapError" v-if="mapErrorFlag" @click="mapInit">
+      <img src="../../static/images/networkError.png" alt>
+    </div>
   </div>
 </template>
 
@@ -13,7 +16,8 @@ export default {
     return {
       msg: "地图",
       map: {}, //高德地图对象,
-      showFlags: this.dataFLag
+      showFlags: this.dataFLag,
+      mapErrorFlag: true
     };
   },
   mounted() {
@@ -27,6 +31,7 @@ export default {
         zoom: 13,
         resizeEnable: true
       });
+      this.mapErrorFlag = false;
       this.map.setCity(baseConstant.adname); //定位到城市。
       var self = this;
       AMap.plugin(["AMap.ToolBar", "AMap.Geolocation"], function() {
@@ -57,6 +62,7 @@ export default {
         AMap.event.addListener(geolocation, "error", onError); //返回定位出错信息
         function onComplete(data) {
           // 需要保存位置信息
+          console.log(data);
           var posX = data.position.getLng();
           var poxY = data.position.getLat();
           //self.$store.commit("changeNowLocation", posX + "," + poxY);
@@ -64,6 +70,8 @@ export default {
         }
         function onError(data) {
           console.log(data);
+          // 地图加载失败时，友好提示。
+          // self.mapError();
         }
         document
           .getElementsByClassName("amap-geolocation-con")[0]
@@ -77,6 +85,9 @@ export default {
             false
           );
       });
+    },
+    mapError() {
+      this.mapErrorFlag = true;
     }
   }
 };
@@ -84,4 +95,16 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+.mapError {
+  position: absolute;
+  top: 288px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  height: 280px;
+}
+.mapError img {
+  width: 100%;
+  height: 100%;
+}
 </style>

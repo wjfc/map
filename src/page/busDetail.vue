@@ -13,7 +13,7 @@
           <swiper-slide v-for="(v,i) in transits" :key="i">
             <div class="listbox">
               <div class="mapPreview">
-                <mapPreview></mapPreview>
+                <mapPreview @click.native="goBusMapPreview('','start')"></mapPreview>
               </div>
               <basicList :v="v"></basicList>
             </div>
@@ -80,8 +80,9 @@
                 <p>{{v.buslines[0].via_stops.length+2}}站</p>
                 <i class="icon-wj_ic_down"></i>
               </div>
-              <!-- 所有站列表 -->
+
               <div v-show="showFlags[i]" class="allStopsList">
+                <!-- 所有站列表 需要和公交接口数据对接，不能匹配的用高德，能匹配的用公交数据-->
                 <!-- 上车站 -->
                 <div class="departure_stop">
                   {{v.buslines[0].departure_stop.name}}
@@ -192,9 +193,7 @@ export default {
       // 处理高德导航返回的数据。
       var showFlag = [];
       var mysegments = [];
-
       var segments = this.transits[this.activeIndex].segments;
-
       segments.forEach((v, i) => {
         var obj = {};
         // 大于50米的才算步行逻辑
@@ -219,7 +218,6 @@ export default {
       /**
        * 1、换乘时候，只画起点，不画终点。如果下一个起点和当前的终点一致，则展示同站换乘，不去做步行路线；否则的话，显示起点名称。
        * 2、到最后一步的时候，再画终点。
-       *
        */
       if (i == 0) {
         return "我的位置";
