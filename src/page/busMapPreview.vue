@@ -149,10 +149,6 @@ export default {
         this.walkLines.forEach((v, i) => {
           self.$refs.mapObj.map.remove(v);
         });
-        this.walkLines.forEach((v, i) => {
-          self.$refs.mapObj.map.remove(v);
-        });
-        self.$refs.mapObj.map.remove(v);
       } catch (error) {}
 
       //绘制乘车的路线
@@ -238,6 +234,7 @@ export default {
         }
         self.$refs.mapObj.map.setFitView();
       });
+      // console.log(self.walkLines);
     },
     // 按步执行
     getSteps(arr) {

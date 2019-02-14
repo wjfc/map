@@ -74,10 +74,11 @@ export default {
       };
       apis.searchByKeyword(params, function(res) {
         self.historyList = res.data.tips;
+        // console.log(res.data);
         self.clearMsg = "取消";
-        if (self.historyList.length < 1 && self.searchContent) {
+        if (res.data.tips.length < 1 && self.searchContent !== "") {
           // 显示未搜索到结果
-          self.nosearch = true;
+          // self.nosearch = true;
         }
       });
     },
