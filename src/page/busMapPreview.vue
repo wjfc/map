@@ -47,12 +47,13 @@ export default {
       origin: "", //七点
       destination: "", //终点
       styleObject: {},
-      walkLines: [],
+      walkLines: [], //全路线绘制
       busLines: [],
       transits: [], //高德返回路线数组
       mysegments: [],
       stepIndex: 0, //按步执行的索引,
-      steps: []
+      steps: [], //步骤数组,
+      activeShowLine: null //按步执行索引后当前展示的路线
     };
   },
   created() {},
@@ -68,7 +69,6 @@ export default {
       index: this.$route.query.index, //方案中的某一步
       point: this.$route.query.point
     };
-    //console.log(this.options);
     this.destination = this.$route.query.location; //终点
     this.getRoutes(this.options.type);
   },
@@ -234,11 +234,9 @@ export default {
         }
         self.$refs.mapObj.map.setFitView();
       });
-      // console.log(self.walkLines);
     },
     // 按步执行
     getSteps(arr) {
-      console.log(arr);
       var self = this;
       var steps = [];
       // 开始出发
@@ -256,18 +254,21 @@ export default {
             if (s) {
               steps.push({
                 desc: "站内换乘" + v.walking.distance + "m",
-                distance: ""
+                distance: "",
+                draw: v.walking.steps
               });
             } else {
               steps.push({
                 desc: "步行到" + v.buslines[0].departure_stop.name,
-                distance: v.walking.distance + "m"
+                distance: v.walking.distance + "m",
+                draw: v.walking.steps
               });
             }
           } else {
             steps.push({
               desc: "步行" + v.walking.distance + "m",
-              distance: ""
+              distance: "",
+              draw: v.walking.steps
             });
           }
           if (self.options.point == "walking" && this.options.index == i) {
@@ -281,13 +282,15 @@ export default {
               "从" +
               v.buslines[0].departure_stop.name +
               "到" +
-              v.buslines[0].arrival_stop.name
+              v.buslines[0].arrival_stop.name,
+            draw: v.buslines[0].polyline
           });
           if (self.options.point == "busline" && this.options.index == i) {
             self.stepIndex = steps.length - 1;
           }
         }
       });
+      // 终点
       steps.push({
         desc: "到达" + this.options.name,
         distance: ""
@@ -295,8 +298,8 @@ export default {
       if (self.options.point == "end") {
         self.stepIndex = steps.length - 1;
       }
-      self.swiper.slideTo(self.stepIndex, 0, function() {});
       this.steps = steps;
+      self.swiper.slideTo(self.stepIndex, 0, function() {});
     },
     // 是否展示同站换乘
     showSame(v, i) {
@@ -312,6 +315,53 @@ export default {
     },
     slideChangeTransitionEnd() {
       this.stepIndex = this.swiper.activeIndex;
+      this.reDrawLine(this.steps[this.stepIndex].draw);
+    },
+    // 按布绘制路线
+    reDrawLine(obj) {
+      switch (typeof obj) {
+        case "undefined":
+          // 不做处理
+          break;
+        case "object":
+          var polylinesStr = "";
+          var path = [];
+          obj.forEach(function(v, i) {
+            polylinesStr += ";" + v.polyline;
+          });
+          polylinesStr = polylinesStr.substr(1);
+          var polyline = polylinesStr.split(";");
+          polyline.forEach((v, i) => {
+            path.push([v.split(",")[0], v.split(",")[1]]);
+          });
+          this.drawCurrentLine(path);
+          break;
+        case "string":
+          var polyline = obj.split(";");
+          var path = [];
+          polyline.forEach((v, i) => {
+            path.push([v.split(",")[0], v.split(",")[1]]);
+          });
+          this.drawCurrentLine(path);
+          break;
+      }
+    },
+    drawCurrentLine(path) {
+      if (this.activeShowLine) {
+        this.$refs.mapObj.map.remove(this.activeShowLine);
+      }
+      this.activeShowLine = new AMap.Polyline({
+        path: path,
+        isOutline: true,
+        outlineColor: "white",
+        strokeColor: "red", //线颜色
+        strokeOpacity: 0.5, //线透明度
+        lineJoin: "round",
+        strokeWeight: 6, //线宽
+        zIndex: 12
+      });
+      this.$refs.mapObj.map.add(this.activeShowLine);
+      this.$refs.mapObj.map.setFitView(this.activeShowLine);
     }
   },
   computed: {
