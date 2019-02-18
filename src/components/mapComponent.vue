@@ -23,7 +23,7 @@ export default {
   mounted() {
     this.mapInit();
   },
-  props: ["dataFLag"],
+  props: ["dataFLag", "dataFrom"],
   methods: {
     ...mapMutations(["changeNowLocation"]),
     mapInit() {
@@ -34,6 +34,11 @@ export default {
       this.mapErrorFlag = false;
       this.map.setCity(baseConstant.adname); //定位到城市。
       var self = this;
+      self.changeNowLocation("120.638966" + "," + "31.151753"); //临时定位到吴江广播电视台
+      if (this.dataFrom == "home") {
+        // 如果是主页，则调用吴江公交，搜索最近的车站接口
+        this.$emit("wjtran_search");
+      }
       AMap.plugin(["AMap.ToolBar", "AMap.Geolocation"], function() {
         var toolbar = new AMap.ToolBar({});
         self.map.addControl(toolbar);
@@ -57,7 +62,7 @@ export default {
           zoomToAccuracy: self.showFlags //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
         });
         self.map.addControl(geolocation);
-        geolocation.getCurrentPosition();
+        // geolocation.getCurrentPosition();
         AMap.event.addListener(geolocation, "complete", onComplete); //返回定位信息
         AMap.event.addListener(geolocation, "error", onError); //返回定位出错信息
         function onComplete(data) {

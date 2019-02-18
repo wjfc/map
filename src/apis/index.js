@@ -11,6 +11,17 @@ var getRoutesInfo = function(params, callback) {
       callback(res);
     });
 };
+// 获取步行路线规划
+var getWalkingInfo = function(params, callback) {
+  var url = "/v3/direction/walking";
+  instance
+    .get(url, {
+      params: params
+    })
+    .then(function(res) {
+      callback(res);
+    });
+};
 // 模糊搜索接口
 var searchByKeyword = function(params, callback) {
   var url = "/v3/assistant/inputtips";
@@ -21,11 +32,46 @@ var searchByKeyword = function(params, callback) {
     .then(function(res) {
       callback(res);
     })
-    .catch(function(error){
+    .catch(function(error) {
+      callback(error);
+    });
+};
+
+/**
+ *吴江公交相关接口
+ *
+ */
+// 根据当前经纬度以及范围搜索附近的车站接口
+var searchStationByRange = function(params, callback) {
+  var url = "/wjtran/station/search";
+  instance
+    .get(url, {
+      params: params
+    })
+    .then(function(res) {
+      callback(res);
+    })
+    .catch(function(error) {
+      callback(error);
+    });
+};
+var findChannelBySguids = function(params, callback) {
+  var url = "/wjtran/channel/find";
+  instance
+    .get(url, {
+      params: params
+    })
+    .then(function(res) {
+      callback(res);
+    })
+    .catch(function(error) {
       callback(error);
     });
 };
 export default {
   getRoutesInfo: getRoutesInfo,
-  searchByKeyword: searchByKeyword
+  getWalkingInfo: getWalkingInfo,
+  searchByKeyword: searchByKeyword,
+  searchStationByRange: searchStationByRange,
+  findChannelBySguids: findChannelBySguids
 };

@@ -1,7 +1,25 @@
 <template>
   <div class="home">
     <search></search>
-    <mapComponent class="mapComponent" :dataFLag="true"></mapComponent>
+    <mapComponent
+      class="mapComponent"
+      :class="{showChannel:showChannel}"
+      :dataFLag="true"
+      ref="mapObj"
+      :dataFrom="dataFrom"
+      @wjtran_search="searchStation"
+    ></mapComponent>
+
+    <div class="channel" v-show="showChannel">
+      <div class="tips-l">
+        <div class="stationName">{{stationInfo.name}}站</div>
+        <div class="channels">{{stationInfo.channels}}</div>
+      </div>
+      <div class="tips-r" @click="getWalking()">
+        <p class="icon-wj_ic_onfoot"></p>
+        <p>去这里</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -9,13 +27,130 @@
 import search from "@/components/search"; //搜索框
 import history from "@/components/history"; //历史记录框
 import mapComponent from "@/components/mapComponent"; //首页地图组件
+import baseConstant from "@/constant/index.js";
+import apis from "@/apis/index.js";
 export default {
   name: "home",
   data() {
-    return {};
+    return {
+      dataFrom: "home",
+      showChannel: false,
+      stationInfo: {}, //站台信息
+      stationMark: [], //获取到的点标记数据
+      stationIcon: [], //高德描点图标数组
+      walkingPath: [] //步行路线
+    };
   },
   mounted() {},
-  methods: {},
+  methods: {
+    searchStation() {
+      var self = this;
+      if (!this.$store.state.location_now) {
+        var origin = localStorage.getItem("location_now");
+      } else {
+        var origin = this.$store.state.location_now;
+      }
+      var params = {
+        lon: origin.split(",")[0],
+        lat: origin.split(",")[1],
+        range: 500
+      };
+      apis.searchStationByRange(params, function(res) {
+        // 公交站一般是两个方向的。
+        self.stationMark = res.data.record.slice(0, 10);
+        self.drawStationMark();
+        // 描点公交站
+      });
+    },
+    // 绘制点，以及添加点击方法
+    drawStationMark() {
+      // 添加点标记前需要先清除点标记
+      if (this.stationIcon.length > 0) {
+        this.clearStationMark();
+      }
+      var self = this;
+      console.log(this.stationMark);
+      this.stationMark.forEach((v, i) => {
+        var left = [-12, -38, -64, -94, -123, -150, -179, -207, -236, -263];
+        var startIcon = new AMap.Icon({
+          // 图标尺寸
+          size: new AMap.Size(19, 32),
+          // 图标的取图地址
+          image: "../../static/images/mapicon_05.png",
+          // 图标所用图片大小
+          imageSize: new AMap.Size(290, 413),
+          // 图标取图偏移量
+          imageOffset: new AMap.Pixel(left[i], -123)
+        });
+        // 将 icon 传入 marker
+        var startMarker = new AMap.Marker({
+          position: new AMap.LngLat(
+            this.stationMark[i].lon,
+            this.stationMark[i].lat
+          ),
+          icon: startIcon,
+          offset: new AMap.Pixel(-13, -30)
+        });
+        startMarker.index = i;
+        startMarker.on("click", function(e) {
+          var index = e.target.index; //点击图标的索引
+          self.showChannel = true;
+          // 调用获取公交路线接口
+          var params = {
+            sguids: self.stationMark[index].sguid
+          };
+          apis.findChannelBySguids(params, function(res) {
+            console.log(res);
+            self.showChannelInfo(res.data.records, index);
+          });
+        });
+        self.stationIcon.push(startMarker);
+      });
+      this.$refs.mapObj.map.add(self.stationIcon);
+    },
+    // 清除点标记
+    clearStationMark() {
+      this.$refs.mapObj.map.remove(this.stationIcon);
+    },
+    // 显示线路详情
+    showChannelInfo(data, index) {
+      var self = this;
+      var str = "";
+      for (var i = 0; i < data.length; i++) {
+        str += data[i].lname + "路" + ";";
+      }
+      self.stationInfo = {
+        name: self.stationMark[index].sname,
+        channels: str,
+        dataIndex: index
+      };
+    },
+    getWalking() {
+      // 获取步行路线
+      if (!this.$store.state.location_now) {
+        var origin = localStorage.getItem("location_now");
+      } else {
+        var origin = this.$store.state.location_now;
+      }
+      // 显示步行导航路线
+      var destination =
+        this.stationMark[this.stationInfo.dataIndex].lon +
+        "," +
+        this.stationMark[this.stationInfo.dataIndex].lat;
+      var params = {
+        origin: origin,
+        destination: destination,
+        key: baseConstant.key
+      };
+      apis.getWalkingInfo(params, function(res) {
+        console.log(res);
+      });
+    },
+    // 绘制步行路线
+    drawWalkingPath() {},
+    // 清除步行路线
+    clearWalkingPath() {}
+  },
   components: {
     search: search,
     mapComponent: mapComponent
@@ -25,6 +160,50 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+/* channel */
+.channel {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  position: absolute;
+  left: 30px;
+  bottom: 40px;
+  width: 690px;
+  height: 208px;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+}
+.tips-l {
+  margin-left: 40px;
+  width: 460px;
+}
+.stationName {
+  font-size: 40px;
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 20px;
+}
+.channels {
+  font-size: 26px;
+  color: #999;
+}
+.tips-r {
+  width: 128px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 40px;
+  color: #37cabe;
+}
+.tips-r p:first-child {
+  font-size: 72px;
+}
+.tips-r p:last-child {
+  font-size: 24px;
+}
+/* channel结束 */
+
 .mapComponent {
   position: absolute;
   top: 88px;
@@ -44,9 +223,13 @@ export default {
 .amap-copyright {
   display: none !important;
 }
-.mapComponent.amap-geolocation-con,
+.mapComponent .amap-geolocation-con,
 .mapComponent .amap-toolbar {
   bottom: 47px !important;
+}
+.mapComponent.showChannel .amap-geolocation-con,
+.mapComponent.showChannel .amap-toolbar {
+  bottom: 278px !important;
 }
 .amap-touch-toolbar .amap-zoomcontrol {
   bottom: 0 !important;

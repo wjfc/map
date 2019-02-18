@@ -61,7 +61,7 @@ export default {
   data() {
     return {
       msg: "",
-      noticeList: [] //通知列表
+      busList: [] //公交车双向列表
     };
   },
   mounted() {

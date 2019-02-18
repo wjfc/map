@@ -467,6 +467,7 @@ export default {
 .amap-copyright {
   display: none !important;
 }
+
 .mapComponent2 .amap-geolocation-con,
 .mapComponent2 .amap-toolbar {
   bottom: 278px !important;

@@ -26,6 +26,10 @@ module.exports = {
       "/v3": {
         target: "https://restapi.amap.com/", // 接口域名
         changeOrigin: true //是否跨域
+      },
+      "/wjtran": {
+        target: "https://gjcx.smartwj.net:8999",
+        changeOrigin: true //是否跨域
       }
     },
     // https://webpack.js.org/configuration/devtool/#development
