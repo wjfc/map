@@ -38,7 +38,9 @@ export default {
       stationInfo: {}, //站台信息
       stationMark: [], //获取到的点标记数据
       stationIcon: [], //高德描点图标数组
-      walkingPath: [] //步行路线
+      walkLine: null, //步行路线,
+      origin: "", //起点
+      destination: "" //终点
     };
   },
   mounted() {},
@@ -50,6 +52,7 @@ export default {
       } else {
         var origin = this.$store.state.location_now;
       }
+      this.origin = origin;
       var params = {
         lon: origin.split(",")[0],
         lat: origin.split(",")[1],
@@ -69,7 +72,6 @@ export default {
         this.clearStationMark();
       }
       var self = this;
-      console.log(this.stationMark);
       this.stationMark.forEach((v, i) => {
         var left = [-12, -38, -64, -94, -123, -150, -179, -207, -236, -263];
         var startIcon = new AMap.Icon({
@@ -100,13 +102,13 @@ export default {
             sguids: self.stationMark[index].sguid
           };
           apis.findChannelBySguids(params, function(res) {
-            console.log(res);
             self.showChannelInfo(res.data.records, index);
           });
         });
         self.stationIcon.push(startMarker);
       });
       this.$refs.mapObj.map.add(self.stationIcon);
+      this.$refs.mapObj.map.setFitView(self.stationIcon);
     },
     // 清除点标记
     clearStationMark() {
@@ -127,29 +129,75 @@ export default {
     },
     getWalking() {
       // 获取步行路线
-      if (!this.$store.state.location_now) {
-        var origin = localStorage.getItem("location_now");
-      } else {
-        var origin = this.$store.state.location_now;
-      }
+      var self = this;
       // 显示步行导航路线
       var destination =
         this.stationMark[this.stationInfo.dataIndex].lon +
         "," +
         this.stationMark[this.stationInfo.dataIndex].lat;
       var params = {
-        origin: origin,
+        origin: this.origin,
         destination: destination,
         key: baseConstant.key
       };
+      this.destination = destination;
       apis.getWalkingInfo(params, function(res) {
-        console.log(res);
+        self.drawWalkingPath(res.data);
+        self.drawStartAndEnd();
       });
     },
     // 绘制步行路线
-    drawWalkingPath() {},
+    drawWalkingPath(data) {
+      if (this.walkLine) {
+        this.clearWalkingPath();
+      }
+      var self = this;
+
+      var steps = data.route.paths[0].steps;
+
+      var walkPath = [];
+      var pathStr = "";
+      var walkLine;
+      steps.forEach((v, i) => {
+        pathStr += v.polyline + ";";
+      });
+      pathStr = pathStr.substr(0, pathStr.length - 1);
+      var polylineArray = pathStr.split(";");
+      walkPath.push([this.origin.split(",")[0], this.origin.split(",")[1]]);
+      for (var k = 0; k < polylineArray.length; k++) {
+        walkPath.push([
+          polylineArray[k].split(",")[0],
+          polylineArray[k].split(",")[1]
+        ]);
+      }
+      walkPath.push([
+        this.destination.split(",")[0],
+        this.destination.split(",")[1]
+      ]);
+      walkLine = new AMap.Polyline({
+        path: walkPath,
+        isOutline: true,
+        outlineColor: "#ffeeee",
+        borderWeight: 2,
+        strokeWeight: 5,
+        strokeColor: "#37cabe",
+        lineJoin: "round",
+        strokeStyle: "dashed",
+        zIndex: 10
+      });
+      this.walkLine = walkLine;
+      self.$refs.mapObj.map.add(walkLine);
+      self.$refs.mapObj.map.setFitView([walkLine]);
+    },
     // 清除步行路线
-    clearWalkingPath() {}
+    clearWalkingPath() {
+      this.$refs.mapObj.map.remove(this.walkLine);
+    },
+    // 绘制起点和终点
+    drawStartAndEnd() {
+      // 绘制起点
+      // 绘制终点
+    }
   },
   components: {
     search: search,
@@ -243,5 +291,6 @@ export default {
   box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.2);
   background-size: 100% 100%;
 }
+
 /* 更改左下角默认样式  */
 </style>

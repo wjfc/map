@@ -73,7 +73,21 @@ export default {
         type: "15000|"
       };
       apis.searchByKeyword(params, function(res) {
-        self.historyList = res.data.tips;
+        /**
+         * 1、需要做判断，如果输入的是汉字，调用高德的模糊搜索接口。
+         * 2、如果输入的是数字，则调用吴江公交的接口。
+         * 3、返回值也需要做判断。不同的返回值做不同的处理。
+         */
+        var historyList = [];
+        var tips = res.data.tips;
+
+        tips.forEach((v, i) => {
+          // if (v.adcode == "320509") {
+          //   historyList.push(v);
+          // }
+          historyList.push(v);
+        });
+        self.historyList = historyList;
         // console.log(res.data);
         self.clearMsg = "取消";
         if (res.data.tips.length < 1 && self.searchContent !== "") {
