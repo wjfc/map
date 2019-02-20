@@ -38,11 +38,17 @@ export default {
   color: #fff;
 }
 .basicHeader header p {
-  width: 100%;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+  width: 80%;
   height: 88px;
   text-align: center;
   line-height: 88px;
   font-size: 36px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .basicHeader .backArrow {
   position: absolute;

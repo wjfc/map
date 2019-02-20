@@ -1,16 +1,16 @@
 <template>
   <div class="home">
-    <search></search>
+    <search ref="searchObj"></search>
     <mapComponent
       class="mapComponent"
-      :class="{showChannel:showChannel}"
+      :class="{showChannel:showChannel&&!this.$refs.searchObj.showList}"
       :dataFLag="true"
       ref="mapObj"
       :dataFrom="dataFrom"
       @wjtran_search="searchStation"
     ></mapComponent>
 
-    <div class="channel" v-show="showChannel">
+    <div class="channel" v-show="showChannel&&!this.$refs.searchObj.showList">
       <div class="tips-l">
         <div class="stationName">{{stationInfo.name}}站</div>
         <div class="channels">{{stationInfo.channels}}</div>
@@ -152,9 +152,7 @@ export default {
         this.clearWalkingPath();
       }
       var self = this;
-
       var steps = data.route.paths[0].steps;
-
       var walkPath = [];
       var pathStr = "";
       var walkLine;

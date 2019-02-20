@@ -3,7 +3,7 @@
     <header>
       <div class="destation">
         <div class="backArrow icon-wj_ic_back" @click="goBack()"></div>
-        <span>{{options.name}}</span>
+        <p>{{options.name}}</p>
       </div>
       <ul class="strategy">
         <li
@@ -136,6 +136,19 @@ export default {
   line-height: 88px;
   font-size: 36px;
   background: #37cabe;
+}
+.road header div.destation p {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+  width: 80%;
+  height: 88px;
+  text-align: center;
+  line-height: 88px;
+  font-size: 36px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .road .backArrow {
   position: absolute;

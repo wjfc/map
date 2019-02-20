@@ -1,6 +1,6 @@
 <template>
   <div class="buslines">
-    <basicHeader :desName="msg"></basicHeader>
+    <basicHeader :desName="options.name"></basicHeader>
     <div class="mapPreview">
       <mapPreview @click.native="goBusMapPreview()"></mapPreview>
     </div>
@@ -61,11 +61,17 @@ export default {
   data() {
     return {
       msg: "",
+      options: {},
       busList: [] //公交车双向列表
     };
   },
   mounted() {
-    this.msg = "162路";
+    this.options = {
+      name: this.$route.query.lname + "路",
+      lname: this.$route.query.lname,
+      lguid: this.$route.query.lguid,
+      isMain: this.$route.query.isMain
+    };
   },
   methods: {
     goBusMapPreview() {}

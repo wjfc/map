@@ -418,6 +418,7 @@ export default {
 }
 .stepItem p:first-child {
   font-size: 38px;
+  margin-bottom: 20px;
   color: #000;
   line-height: 38px;
 }

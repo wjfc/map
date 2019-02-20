@@ -18,16 +18,22 @@
     </div>
     <button class="btn">搜索</button>
     <!-- 历史记录列表 -->
-    <div class="historyList" v-if="historyList && historyList.length>0&&showList">
+    <div class="historyList" v-show="historyList && historyList.length>0&&showList">
       <ul class="lists">
         <li class="listItem" v-for="(v,i) in historyList" :key="i" @click="goDestation(v)">
           <p>
-            <span></span>
+            <span
+              :class="{'icon-wj_ic_bus':v.id=='wjgj','icon-wj_ic_point':v.id!='wjgj'}"
+              class="ico-wj"
+            ></span>
             <span>{{v.name}}</span>
           </p>
         </li>
       </ul>
-      <div class="clear" @click="clearList()">{{clearMsg}}</div>
+      <div class="clear">
+        <p v-if="!searchContent" @click="hideList">取消</p>
+        <p @click="clearList()">{{clearMsg}}</p>
+      </div>
     </div>
     <!-- 历史记录列表结束 -->
   </div>
@@ -46,7 +52,7 @@ export default {
       historyList: [], //展示的列表
       searchStorage: [], //保存在本地的历史记录
       clearMsg: "取消",
-      showList: true, //展示列表flag,
+      showList: false, //展示列表flag,
       nosearch: false
     };
   },
@@ -71,6 +77,13 @@ export default {
        * 3、返回值也需要做判断。不同的返回值做不同的处理。
        */
       var regx = /^[0-9]*$/;
+      if (!this.searchContent) {
+        self.historyList = self.searchStorage;
+        self.showList = self.historyList.length > 0 ? true : false;
+        self.clearMsg = "清空";
+        return false;
+      }
+
       if (regx.test(this.searchContent)) {
         // 纯数字调用吴江公交接口
         // 吴江公交搜索接口
@@ -88,6 +101,11 @@ export default {
             historyList.push(v);
           });
           self.historyList = historyList;
+          if (self.historyList.length > 0) {
+            self.showList = true;
+          } else {
+            self.showList = false;
+          }
           self.clearMsg = "取消";
         });
       } else {
@@ -109,6 +127,11 @@ export default {
             }
           });
           self.historyList = historyList;
+          if (self.historyList.length > 0) {
+            self.showList = true;
+          } else {
+            self.showList = false;
+          }
           self.clearMsg = "取消";
         });
       }
@@ -118,9 +141,11 @@ export default {
       this.showList = true;
       if (this.searchContent == "") {
         // 输入框为空时，查询历史记录展示
-        this.nosearch = false;
         this.historyList = this.searchStorage;
-        this.clearMsg = "清空全部历史记录";
+        if (this.historyList == 0) {
+          this.showList = false;
+        }
+        this.clearMsg = "清空";
       }
     },
     // 输入框失去焦点逻辑
@@ -150,6 +175,14 @@ export default {
         });
       } else {
         // 跳转到线路页面
+        this.$router.push({
+          path: "/busLines",
+          query: {
+            lname: v.lname,
+            lguid: v.lguid,
+            isMain: v.isMain
+          }
+        });
       }
     },
     clearList() {
@@ -160,6 +193,11 @@ export default {
         this.searchStorage = [];
         localStorage.removeItem("searchStorage");
       }
+    },
+    // 隐藏列表
+    hideList() {
+      // 当展示的是历史记录时，点击取消则是隐藏
+      this.showList = false;
     },
     // 数组去重
     uniqueList(v, arr) {
@@ -275,7 +313,7 @@ input {
   width: 100%;
   max-height: 1194px;
   background: #fff;
-  z-index: 999;
+  z-index: 10000;
 }
 .lists {
   width: 100%;
@@ -289,22 +327,39 @@ input {
   background: #fff;
 }
 .lists li p {
+  display: flex;
+  align-items: center;
   width: 690px;
   height: 100%;
   margin: 0 auto;
   border-bottom: 1px solid #f5f5f5;
   box-sizing: border-box;
 }
+.lists li p span {
+  display: block;
+}
+.lists li p span.ico-wj {
+  font-size: 38px;
+  margin-right: 20px;
+}
 .lists li:hover {
   cursor: pointer;
 }
 .clear {
+  display: flex;
   width: 100%;
   height: 98px;
   line-height: 98px;
   font-size: 30px;
   text-align: center;
   color: #000;
+}
+.clear p {
+  flex: 1;
+}
+.clear p:first-child {
+  border-right: 2px solid #f9f9f9;
+  box-sizing: border-box;
 }
 /* 历史记录样式结束 */
 </style>

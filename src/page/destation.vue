@@ -2,6 +2,7 @@
   <div class="destation">
     <basicHeader :desName="options.name"></basicHeader>
     <mapComponent class="mapComponent2" ref="mapObj" :dataFLag="false"></mapComponent>
+    <div class="walking-tips" v-show="walkingTips" @click="closeWalkingTips">路程较短建议步行!</div>
     <div class="tips">
       <div class="tips-l">
         <p>{{options.name}}</p>
@@ -16,19 +17,24 @@
 </template>
 
 <script>
+import apis from "@/apis/index.js";
 import basicHeader from "@/components/basicHeader"; //通用头部组件
 import mapComponent from "@/components/mapComponent"; //地图组件
+import baseConstant from "@/constant/index.js";
 export default {
   name: "destaion",
   data() {
     return {
       msg: "目的地导向地图",
-      options: {}
+      options: {},
+      walkingTips: false,
+      walkingTime: null
     };
   },
   created() {},
   mounted() {
     var self = this;
+
     this.options = {
       name: decodeURI(this.$route.query.name),
       address: decodeURI(this.$route.query.address),
@@ -43,13 +49,32 @@ export default {
   methods: {
     busList() {
       var self = this;
-      this.$router.push({
-        path: "/busList",
-        query: {
-          name: encodeURI(this.options.name),
-          address: encodeURI(this.options.address),
-          location: this.options.location,
-          id: this.options.id
+      // 跳转前需要做判断，路程短的话，提示步行。
+      if (!this.$store.state.location_now) {
+        var origin = localStorage.getItem("location_now");
+      } else {
+        var origin = this.$store.state.location_now;
+      }
+      var params = {
+        origin: origin, //当前位置定位
+        destination: this.options.location, //目的地位置定位
+        key: baseConstant.key,
+        city: baseConstant.adname
+      };
+
+      apis.getRoutesInfo(params, function(res) {
+        if (res.data.route.transits.length > 0) {
+          self.$router.push({
+            path: "/busList",
+            query: {
+              name: encodeURI(self.options.name),
+              address: encodeURI(self.options.address),
+              location: self.options.location,
+              id: self.options.id
+            }
+          });
+        } else {
+          self.showWalkTips();
         }
       });
     },
@@ -57,7 +82,7 @@ export default {
       var self = this;
       var endIcon = new AMap.Icon({
         size: new AMap.Size(29, 35), // 图标尺寸
-        image: "../../static/images/mark0.png", // Icon的图像
+        image: "../../static/images/endIcon.png", // Icon的图像
         imageSize: new AMap.Size(29, 35) // 根据所设置的大小拉伸或压缩图片
       });
       var marker = new AMap.Marker({
@@ -73,6 +98,21 @@ export default {
       });
       this.$refs.mapObj.map.add([marker]);
       this.$refs.mapObj.map.setFitView([marker]);
+    },
+    showWalkTips() {
+      this.walkingTips = true;
+      var self = this;
+      if (this.walkingTime) {
+        clearInterval(this.walkingTime);
+      }
+      this.walkingTime = setTimeout(function() {
+        self.walkingTips = false;
+      }, 3000);
+    },
+    closeWalkingTips() {
+      clearInterval(this.walkingTime);
+      this.walkingTime = null;
+      this.walkingTips = false;
     }
   },
   computed: {},
@@ -85,6 +125,19 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+.destation .walking-tips {
+  position: absolute;
+  top: 128px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 690px;
+  height: 160px;
+  background: #fff;
+  border-radius: 16px;
+  text-align: center;
+  line-height: 160px;
+  font-size: 30px;
+}
 .destation .tips {
   position: absolute;
   display: flex;
@@ -97,6 +150,7 @@ export default {
   transform: translateX(-50%);
   z-index: 999;
   background: #fff;
+  border-radius: 16px;
 }
 .tips-l {
   margin-left: 40px;
