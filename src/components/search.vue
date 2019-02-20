@@ -64,37 +64,54 @@ export default {
       //表单提交
       this.nosearch = false;
       var self = this;
-      var params = {
-        key: baseConstant.key,
-        keywords: this.searchContent,
-        city: baseConstant.adcode,
-        citylimit: true,
-        // 15000:交通相关  19000:地名相关
-        type: "15000|"
-      };
-      apis.searchByKeyword(params, function(res) {
-        /**
-         * 1、需要做判断，如果输入的是汉字，调用高德的模糊搜索接口。
-         * 2、如果输入的是数字，则调用吴江公交的接口。
-         * 3、返回值也需要做判断。不同的返回值做不同的处理。
-         */
-        var historyList = [];
-        var tips = res.data.tips;
 
-        tips.forEach((v, i) => {
-          // if (v.adcode == "320509") {
-          //   historyList.push(v);
-          // }
-          historyList.push(v);
+      /**
+       * 1、需要做判断，如果输入的是汉字，调用高德的模糊搜索接口。
+       * 2、如果输入的是数字，则调用吴江公交的接口。
+       * 3、返回值也需要做判断。不同的返回值做不同的处理。
+       */
+      var regx = /^[0-9]*$/;
+      if (regx.test(this.searchContent)) {
+        // 纯数字调用吴江公交接口
+        // 吴江公交搜索接口
+        var params = {
+          lname: this.searchContent,
+          pageSize: 12
+        };
+        apis.findChannelBySguids(params, function(res) {
+          console.log(res.data.records);
+          var historyList = [];
+          var records = res.data.records;
+          records.forEach((v, i) => {
+            v.name = v.lname + "路" + "(" + v.ldirection + ")";
+            v.id = "wjgj";
+            historyList.push(v);
+          });
+          self.historyList = historyList;
+          self.clearMsg = "取消";
         });
-        self.historyList = historyList;
-        // console.log(res.data);
-        self.clearMsg = "取消";
-        if (res.data.tips.length < 1 && self.searchContent !== "") {
-          // 显示未搜索到结果
-          // self.nosearch = true;
-        }
-      });
+      } else {
+        // 高德搜索接口
+        var params = {
+          key: baseConstant.key,
+          keywords: this.searchContent,
+          city: baseConstant.adcode,
+          citylimit: true,
+          // 15000:交通相关  19000:地名相关
+          type: "15000|"
+        };
+        apis.searchByKeyword(params, function(res) {
+          var historyList = [];
+          var tips = res.data.tips;
+          tips.forEach((v, i) => {
+            if (v.adcode == "320509") {
+              historyList.push(v);
+            }
+          });
+          self.historyList = historyList;
+          self.clearMsg = "取消";
+        });
+      }
     },
     // 输入框获得焦点逻辑
     inputFocus() {

@@ -22,7 +22,7 @@ var getWalkingInfo = function(params, callback) {
       callback(res);
     });
 };
-// 模糊搜索接口
+// 高德模糊搜索接口
 var searchByKeyword = function(params, callback) {
   var url = "/v3/assistant/inputtips";
   instance
@@ -55,6 +55,7 @@ var searchStationByRange = function(params, callback) {
       callback(error);
     });
 };
+// 线路操作查询，根据线路名称查询公交线路
 var findChannelBySguids = function(params, callback) {
   var url = "/wjtran/channel/find";
   instance
