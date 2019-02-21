@@ -5,47 +5,25 @@
       <mapPreview @click.native="goBusMapPreview()"></mapPreview>
     </div>
     <ul class="buslineBox">
-      <li class="buslineItem">
-        <h3>162路</h3>
+      <li class="buslineItem" v-for="(v,i) in busList" :key="i" @click="goBusLinesInfo(i)">
+        <h3>{{options.name}}</h3>
         <div class="direction">
-          <span>珠江路</span>
+          <span>{{v.station[0].sname}}</span>
           <i class="icon-wj_ic_diraction"></i>
-          <span>儿童医院</span>
+          <span>{{v.station[v.station.length-1].sname}}</span>
         </div>
         <div class="bustimes">
           <div>
             <img src="../../static/images/start.png" alt>
-            <span>05:00</span>
+            <span>{{v.lfstdftime}}</span>
           </div>
           <div>
             <img src="../../static/images/end.png" alt>
-            <span>23:00</span>
+            <span>{{v.lfstdetime}}</span>
           </div>
           <div>
             <span>.</span>
-            <span>票价2元</span>
-          </div>
-        </div>
-      </li>
-      <li class="buslineItem">
-        <h3>162路</h3>
-        <div class="direction">
-          <span>珠江路</span>
-          <i class="icon-wj_ic_diraction"></i>
-          <span>儿童医院</span>
-        </div>
-        <div class="bustimes">
-          <div>
-            <img src="../../static/images/start.png" alt>
-            <span>05:00</span>
-          </div>
-          <div>
-            <img src="../../static/images/end.png" alt>
-            <span>23:00</span>
-          </div>
-          <div>
-            <span>.</span>
-            <span>票价2元</span>
+            <span>票价{{v.station[0].price}}元</span>
           </div>
         </div>
       </li>
@@ -56,6 +34,8 @@
 <script>
 import basicHeader from "@/components/basicHeader"; //通用头部组件
 import mapPreview from "@/components/mapPreview";
+import baseConstant from "@/constant/index.js";
+import apis from "@/apis/index.js";
 export default {
   name: "buslines",
   data() {
@@ -72,9 +52,39 @@ export default {
       lguid: this.$route.query.lguid,
       isMain: this.$route.query.isMain
     };
+    this.getBusList();
   },
   methods: {
-    goBusMapPreview() {}
+    // 返回到地图首页？
+    goBusMapPreview() {
+      this.$router.push({
+        path: "/"
+      });
+    },
+    // 获取公交车列表
+    getBusList() {
+      var self = this;
+      var params = {
+        lname: this.options.lname,
+        pageSize: 12,
+        includeStation: true
+      };
+      apis.findChannelBySguids(params, function(res) {
+        self.busList = res.data.records;
+      });
+    },
+    goBusLinesInfo(i) {
+      this.$router.push({
+        path: "/busLineInfo",
+        query: {
+          name: this.options.lname + "路",
+          lname: this.options.lname,
+          lguid: this.options.lguid,
+          isMain: this.options.isMain,
+          focusIndex: i
+        }
+      });
+    }
   },
   components: {
     basicHeader,
@@ -128,7 +138,7 @@ export default {
   vertical-align: bottom;
 }
 .mapPreview {
-  position: absolute;
+  position: fixed;
   left: 567px;
   bottom: 127px;
 }
