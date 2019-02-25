@@ -33,7 +33,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mapPreview" @click="goBusLineMapPreview">
+              <div class="mapPreview" @click="goBusLineMapPreview(0)">
                 <mapPreview></mapPreview>
               </div>
             </div>
@@ -45,7 +45,7 @@
     </div>
     <div class="buslines-content">
       <ul>
-        <li v-for="(v,i) in stationList" :key="i">{{v.sname}}</li>
+        <li v-for="(v,i) in stationList" :key="i" @click="goBusLineMapPreview(i)">{{v.sname}}</li>
       </ul>
     </div>
   </div>
@@ -110,12 +110,13 @@ export default {
       this.stationList = this.busList[this.activeIndex].station;
     },
     // 跳转到公交线路地图详情页面
-    goBusLineMapPreview() {
+    goBusLineMapPreview(i) {
       this.$router.push({
         path: "/busLineMapPreview",
         query: {
           lname: this.options.lname,
-          lguid: this.busList[this.activeIndex].lguid
+          lguid: this.busList[this.activeIndex].lguid,
+          focusIndex: i
         }
       });
     },

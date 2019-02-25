@@ -143,7 +143,8 @@ export default {
       transits: [], //高德返回路线数组
       segments: [], //方案详情
       mysegments: [], //处理后的方案详情
-      showFlags: [] // 自定义数组用来保存 上下箭头状态。是否是列表展开状态
+      showFlags: [], // 自定义数组用来保存 上下箭头状态。是否是列表展开状态
+      via_stops: [] //处理中间停靠站列表
     };
   },
   created() {},
