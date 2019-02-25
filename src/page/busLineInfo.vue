@@ -33,7 +33,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mapPreview">
+              <div class="mapPreview" @click="goBusLineMapPreview">
                 <mapPreview></mapPreview>
               </div>
             </div>
@@ -42,6 +42,11 @@
           <div class="swiper-pagination" slot="pagination"></div>
         </swiper>
       </div>
+    </div>
+    <div class="buslines-content">
+      <ul>
+        <li v-for="(v,i) in stationList" :key="i">{{v.sname}}</li>
+      </ul>
     </div>
   </div>
 </template>
@@ -69,7 +74,8 @@ export default {
         },
         activeIndex: 0
       },
-      busList: [] //公交车双向列表
+      busList: [], //公交车双向列表
+      stationList: [] //站的列表
     };
   },
   mounted() {
@@ -77,10 +83,11 @@ export default {
       name: this.$route.query.lname + "路",
       lname: this.$route.query.lname,
       lguid: this.$route.query.lguid,
-      isMain: this.$route.query.isMain
+      isMain: this.$route.query.isMain,
+      focusIndex: this.$route.query.focusIndex
     };
     this.msg = this.options.name;
-    this.activeIndex = this.options.focusIndex;
+    this.activeIndex = Number(this.options.focusIndex);
     this.getBusList();
   },
   methods: {
@@ -94,11 +101,27 @@ export default {
       };
       apis.findChannelBySguids(params, function(res) {
         self.busList = res.data.records;
+        self.getStationList();
         self.swiper.slideTo(self.activeIndex, 0, function() {});
+      });
+    },
+    // 获取站台列表
+    getStationList() {
+      this.stationList = this.busList[this.activeIndex].station;
+    },
+    // 跳转到公交线路地图详情页面
+    goBusLineMapPreview() {
+      this.$router.push({
+        path: "/busLineMapPreview",
+        query: {
+          lname: this.options.lname,
+          lguid: this.busList[this.activeIndex].lguid
+        }
       });
     },
     slideChangeTransitionEnd() {
       this.activeIndex = this.swiper.activeIndex;
+      this.getStationList();
     }
   },
   components: {
@@ -179,4 +202,56 @@ export default {
   vertical-align: bottom;
 }
 /* 轮播图部分样式end */
+/* 站点展示部分 */
+.buslines-content {
+  position: absolute;
+  width: 100%;
+  padding-left: 92px;
+  top: 448px;
+  box-sizing: border-box;
+}
+
+.buslines-content li {
+  position: relative;
+  font-weight: bold;
+  color: #212121;
+  padding-left: 39px;
+  font-size: 30px;
+  height: 90px;
+  line-height: 90px;
+}
+.buslines-content li::before {
+  position: absolute;
+  top: 50%;
+  left: -16px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 1);
+  border: 4px solid rgba(15, 200, 153, 1);
+  border-radius: 50%;
+  content: "";
+  z-index: 999;
+}
+.buslines-content li::after {
+  position: absolute;
+  top: 0;
+  left: 0px;
+  content: "";
+  width: 4px;
+  height: 100%;
+  background: #37cabe;
+  z-index: 1;
+}
+.buslines-content li:last-child::before {
+  border: 4px solid #fd3232;
+}
+.buslines-content li:first-child:after {
+  top: 50%;
+  height: 50%;
+}
+.buslines-content li:last-child:after {
+  height: 50%;
+}
+/* 站点展示部分end */
 </style>
