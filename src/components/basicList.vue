@@ -23,7 +23,10 @@ export default {
       msg: "通用列表"
     };
   },
-  props: ["v"],
+  props: ["v", "activeIndex", "mysegment"],
+  mounted() {
+    console.log(this.activeIndex);
+  },
   methods: {
     //格式化公交换乘方案
     formatBus(v) {

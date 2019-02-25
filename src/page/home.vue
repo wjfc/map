@@ -78,7 +78,7 @@ export default {
           // 图标尺寸
           size: new AMap.Size(19, 32),
           // 图标的取图地址
-          image: "../../static/images/mapicon_05.png",
+          image: "./static/images/mapicon_05.png",
           // 图标所用图片大小
           imageSize: new AMap.Size(290, 413),
           // 图标取图偏移量
@@ -91,7 +91,7 @@ export default {
             this.stationMark[i].lat
           ),
           icon: startIcon,
-          offset: new AMap.Pixel(-13, -30)
+          offset: new AMap.Pixel(-10, -16)
         });
         startMarker.index = i;
         startMarker.on("click", function(e) {

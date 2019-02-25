@@ -124,7 +124,7 @@ export default {
       var self = this;
       var endIcon = new AMap.Icon({
         size: new AMap.Size(29, 35), // 图标尺寸
-        image: "../../static/images/mark0.png", // Icon的图像
+        image: "./static/images/mark0.png", // Icon的图像
         imageSize: new AMap.Size(29, 35) // 根据所设置的大小拉伸或压缩图片
       });
       var marker = new AMap.Marker({
@@ -160,7 +160,7 @@ export default {
       var startPosition = new AMap.Marker({
         map: this.$refs.mapObj.map,
         position: [this.origin.split(",")[0], this.origin.split(",")[1]], //基点位置
-        icon: "../../static/images/startIcon.png",
+        icon: "./static/images/startIcon.png",
         zIndex: 10
       });
       // 绘制终点
@@ -170,7 +170,7 @@ export default {
           this.destination.split(",")[0],
           this.destination.split(",")[1]
         ], //基点位置
-        icon: "../../static/images/endIcon.png",
+        icon: "./static/images/endIcon.png",
         zIndex: 10
       });
     },

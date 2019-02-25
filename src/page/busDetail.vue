@@ -15,7 +15,7 @@
               <div class="mapPreview">
                 <mapPreview @click.native="goBusMapPreview('','start')"></mapPreview>
               </div>
-              <basicList :v="v"></basicList>
+              <basicList :v="v" :activeIndex="i"></basicList>
             </div>
           </swiper-slide>
           <!-- Optional controls -->
@@ -59,16 +59,19 @@
             </div>
 
             <!-- 公交车车辆停靠点 -->
-            <div class="bus-via_stops" v-if="departure_stop(v,i)">
+            <div class="bus-via_stops" v-show="departure_stop(v,i)">
               <!-- 车辆到站信息 -->
               <div class="bus-time">
                 <h3>{{v.buslines[0].name}}</h3>
                 <div class="nearestBus">
                   <span>最近一辆</span>
-                  <span>1</span>
+                  <span>{{findBusInfo(v.via_stops_modify[0])}}</span>
                   <span>站到达</span>
                 </div>
-                <div class="timeline">首班车 05:20 末班 19:20</div>
+                <div
+                  class="timeline"
+                  v-if="v.via_stops_modify[0].lfstdetime"
+                >首班车 {{v.via_stops_modify[0].lfstdftime}} 末班{{v.via_stops_modify[0].lfstdetime}}</div>
               </div>
               <!-- 车辆到站信息结束 -->
               <!-- 站总数 -->
@@ -77,27 +80,17 @@
                 :class="{'showFlag':showFlags[i]}"
                 @click.stop="transformFlag(i)"
               >
-                <p>{{v.buslines[0].via_stops.length+2}}站</p>
+                <p>{{v.via_stops_modify.length}}站</p>
                 <i class="icon-wj_ic_down"></i>
               </div>
 
               <div v-show="showFlags[i]" class="allStopsList">
-                <!-- 所有站列表 需要和公交接口数据对接，不能匹配的用高德，能匹配的用公交数据-->
-                <!-- 上车站 -->
-                <div class="departure_stop">
-                  {{v.buslines[0].departure_stop.name}}
-                  <span>上车</span>
-                </div>
                 <!-- 中间停靠站 -->
-                <div
-                  class="via_stop"
-                  v-for="(stop,j) in v.buslines[0].via_stops"
-                  :key="j"
-                >{{stop.name}}</div>
-                <!-- 下车站 -->
-                <div class="arrival_stop">
-                  {{v.buslines[0].arrival_stop.name}}
-                  <span>下车</span>
+                <div class="via_stop" v-for="(stop,j) in v.via_stops_modify" :key="j">
+                  <p>{{stop.name}}</p>
+                  <!-- getBusList_wjgj(v,v.via_stops_modify) -->
+                  <!--  v.via_stops_modify -->
+                  <span>{{j | formatStationName(v.via_stops_modify)}}</span>
                 </div>
               </div>
             </div>
@@ -118,6 +111,7 @@
 
 <script>
 import apis from "@/apis/index.js";
+import $ from "jquery";
 import baseConstant from "@/constant/index.js";
 import basicHeader from "@/components/basicHeader"; //通用头部组件
 import basicList from "@/components/basicList";
@@ -143,8 +137,7 @@ export default {
       transits: [], //高德返回路线数组
       segments: [], //方案详情
       mysegments: [], //处理后的方案详情
-      showFlags: [], // 自定义数组用来保存 上下箭头状态。是否是列表展开状态
-      via_stops: [] //处理中间停靠站列表
+      showFlags: [] // 自定义数组用来保存 上下箭头状态。是否是列表展开状态
     };
   },
   created() {},
@@ -195,6 +188,7 @@ export default {
       var showFlag = [];
       var mysegments = [];
       var segments = this.transits[this.activeIndex].segments;
+      var via_stops = []; //中间停靠站信息
       segments.forEach((v, i) => {
         var obj = {};
         // 大于50米的才算步行逻辑
@@ -205,12 +199,106 @@ export default {
         if (v.bus.buslines.length > 0) {
           // 根据吴江公交接口做替换
           obj.buslines = v.bus.buslines;
+          via_stops = obj.buslines[0].via_stops;
+          via_stops.push(obj.buslines[0].arrival_stop);
+          via_stops.unshift(obj.buslines[0].departure_stop);
+          obj.via_stops_modify = via_stops;
+          var name = obj.buslines[0].name;
+          name = name.substr(0, name.indexOf("路"));
+          var oldArray = via_stops;
+          var url =
+            "/wjtran/channel/match?" +
+            "lname=" +
+            name +
+            "&fromSname=" +
+            oldArray[0].name +
+            "&toSname=" +
+            oldArray[oldArray.length - 1].name;
+          $.ajax({
+            url: url,
+            type: "GET",
+            async: false,
+            success: function(res) {
+              var stations = res.record.station;
+              var startIndex = null;
+              var endIndex = null;
+              stations.forEach((v, i) => {
+                if (v.sname == via_stops[0].name) {
+                  startIndex = i;
+                }
+                if (v.sname == via_stops[via_stops.length - 1].name) {
+                  endIndex = i;
+                }
+              });
+              // 如果存在则显示公交公司提供的数据
+              if (startIndex && endIndex) {
+                var tempObj = [];
+                for (var j = startIndex; j <= endIndex; j++) {
+                  tempObj.push({
+                    name: stations[j].sname,
+                    slno: stations[j].slno,
+                    price: stations[j].price,
+                    lguid: stations[j].lguid,
+                    sguid: stations[j].sguid,
+                    lfstdftime: res.record.lfstdftime,
+                    lfstdetime: res.record.lfstdetime
+                  });
+                }
+                obj.via_stops_modify = tempObj;
+              }
+            },
+            error: function(error) {}
+          });
         }
+
         showFlag.push(false);
         mysegments.push(obj);
       });
       this.showFlags = showFlag;
       this.mysegments = mysegments;
+    },
+    // axios是异步的 使用jquery代替
+    getBusList_wjgj(obj, oldArray) {
+      var obj = obj.buslines[0];
+      var name = obj.name;
+      var self = this;
+      name = name.substr(0, name.indexOf("路"));
+      var params = {
+        lname: name,
+        fromSname: oldArray[0].name,
+        toSname: oldArray[oldArray.length - 1].name
+      };
+      apis.matchChannel(params, function(res) {
+        if (res.data.code == 0) {
+          console.log(res.data.record.station);
+        }
+      });
+    },
+    //
+    findBusInfo(obj) {
+      var slno = obj.slno;
+      var url = "/wjtran/busInfo/find?lguids=" + obj.lguid;
+      var records = [];
+      var lastArr = [];
+      $.ajax({
+        url: url,
+        async: false,
+        success: function(res) {
+          records = res.records;
+          records.forEach((v, i) => {
+            if (v.lastSlno < slno) {
+              var lastNum;
+              lastNum = slno - v.lastSlno;
+              lastArr.push(lastNum);
+            }
+          });
+        }
+      });
+      if (lastArr.length > 0) {
+        return Math.min.apply(null, lastArr);
+      } else {
+        return slno;
+      }
     },
     // 第一步判断
     startName(v, i) {
@@ -273,6 +361,9 @@ export default {
   computed: {
     swiper() {
       return this.$refs.mySwiper.swiper;
+    },
+    via_stops() {
+      return this.mysegments;
     }
   },
   watch: {},
@@ -289,6 +380,16 @@ export default {
       if (v.walking) {
         return "步行" + v.walking.distance + "m";
       }
+    },
+    // 格式化上下车信息
+    formatStationName(i, arr) {
+      if (i == 0) {
+        return "上车";
+      } else if (i == arr.length - 1) {
+        return "下车";
+      } else {
+        return "";
+      }
     }
   }
 };
@@ -296,6 +397,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.busDetail {
+  background-color: #fff;
+}
 .transCode {
   position: fixed;
   right: 40px;
@@ -429,6 +533,13 @@ export default {
   box-sizing: border-box;
   padding-left: 132px;
   background-color: #e3f2f1;
+}
+.via_stop {
+  display: flex;
+}
+.via_stop span {
+  display: block;
+  margin-left: 20px;
 }
 .bus-via_stops .bus-stopsNums {
   display: flex;

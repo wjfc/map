@@ -20,6 +20,7 @@ body {
 #app {
   width: 100%;
   height: 100%;
+  background: #fff;
 }
 /* 公共样式解决插入html css失效 */
 #bus-normal.bus span {

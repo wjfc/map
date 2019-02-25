@@ -210,6 +210,7 @@ export default {
   padding-left: 92px;
   top: 448px;
   box-sizing: border-box;
+  background-color: #fff;
 }
 
 .buslines-content li {

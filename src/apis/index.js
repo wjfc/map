@@ -69,6 +69,20 @@ var findChannelBySguids = function(params, callback) {
       callback(error);
     });
 };
+// 根据线路名称，起始站名称匹配公交线路
+var matchChannel = function(params, callback) {
+  var url = "/wjtran/channel/match";
+  instance
+    .get(url, {
+      params: params
+    })
+    .then(function(res) {
+      callback(res);
+    })
+    .catch(function(error) {
+      callback(error);
+    });
+};
 // http://localhost:8080/wjtran/busInfo/find?lguids=0000000000LINELINEINFO15121021854704
 // http://localhost:8080/wjtran/channelStation/find?lguids=0000000000LINELINEINFO15121021854704
 export default {
@@ -76,5 +90,6 @@ export default {
   getWalkingInfo: getWalkingInfo,
   searchByKeyword: searchByKeyword,
   searchStationByRange: searchStationByRange,
-  findChannelBySguids: findChannelBySguids
+  findChannelBySguids: findChannelBySguids,
+  matchChannel:matchChannel
 };

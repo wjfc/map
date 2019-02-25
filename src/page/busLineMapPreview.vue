@@ -84,7 +84,7 @@ export default {
       this.steps.forEach((v, i) => {
         var markIcon = new AMap.Icon({
           // 图标的取图地址
-          image: "../../static/images/dot1x.png",
+          image: "./static/images/dot1x.png",
           // 图标尺寸
           size: new AMap.Size(12, 12)
           // 选用的图片尺寸
@@ -131,7 +131,7 @@ export default {
       }
       var markIcon = new AMap.Icon({
         // 图标的取图地址
-        image: "../../static/images/location.png",
+        image: "./static/images/location.png",
         // 图标尺寸
         size: new AMap.Size(48, 48)
         // 选用的图片尺寸
@@ -208,9 +208,9 @@ export default {
   box-sizing: border-box;
 }
 .stepItem p {
-  font-size: 38px;
-  color: #000;
-  line-height: 38px;
+  font-size: 38px !important;
+  color: #000 !important;
+  line-height: 38px !important;
 }
 
 /* 底部样式结束 */
