@@ -119,7 +119,7 @@ export default {
           location.split(",")[0],
           location.split(",")[1]
         ),
-        offset: new AMap.Pixel(-10, -10),
+        offset: new AMap.Pixel(-15, -18),
         icon: endIcon,
         title: "010",
         zoom: 13,
@@ -147,7 +147,7 @@ export default {
       var startPosition = new AMap.Marker({
         map: this.$refs.mapObj.map,
         position: [this.origin.split(",")[0], this.origin.split(",")[1]], //基点位置
-        icon: "../../static/images/startIcon.png",
+        icon: "./static/images/startIcon.png",
         zIndex: 10
       });
       // 绘制终点
@@ -157,7 +157,7 @@ export default {
           this.destination.split(",")[0],
           this.destination.split(",")[1]
         ], //基点位置
-        icon: "../../static/images/endIcon.png",
+        icon: "./static/images/endIcon.png",
         zIndex: 10
       });
       // this.$refs.mapObj.map.setFitView();

@@ -85,8 +85,22 @@ var matchChannel = function(params, callback) {
 };
 
 // 获取公交公司提供的通知公告信息列表
-var ggjt_list = function(callback) {
+var ggjt_list = function(params, callback) {
   var url = "/ggjt/list";
+  instance
+    .get(url, {
+      params: params
+    })
+    .then(function(res) {
+      callback(res);
+    })
+    .catch(function(error) {
+      callback(error);
+    });
+};
+// 获取公告详情
+var ggjt_info = function(id, callback) {
+  var url = "/ggjt/detail?id=" + id;
   instance
     .get(url)
     .then(function(res) {
@@ -105,5 +119,6 @@ export default {
   searchStationByRange: searchStationByRange,
   findChannelBySguids: findChannelBySguids,
   matchChannel: matchChannel,
-  ggjt_list: ggjt_list
+  ggjt_list: ggjt_list,
+  ggjt_info: ggjt_info
 };

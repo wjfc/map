@@ -52,4 +52,7 @@ body {
 .swiper-slide {
   width: 100% !important;
 }
+a:active {
+  text-decoration: none;
+}
 </style>

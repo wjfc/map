@@ -20,6 +20,14 @@
         <p>去这里</p>
       </div>
     </div>
+    <div class="newest" v-if="newestMessage">
+      <router-link to="/notice">
+        <div class="circle">
+          <i class="icon-wj_ic_message"></i>
+        </div>
+        <div class="news-title">{{newestMessage.title}}</div>
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -40,7 +48,8 @@ export default {
       stationIcon: [], //高德描点图标数组
       walkLine: null, //步行路线,
       origin: "", //起点
-      destination: "" //终点
+      destination: "", //终点
+      newestMessage: null
     };
   },
   mounted() {
@@ -201,9 +210,16 @@ export default {
     },
     // 获取通知公告
     ggjt_list() {
-      apis.ggjt_list(function(res) {
-        console.log(res);
-      });
+      var self = this;
+      apis.ggjt_list(
+        {
+          pageIndex: 1,
+          pageSize: 1
+        },
+        function(res) {
+          self.newestMessage = res.data.result.list[0];
+        }
+      );
     }
   },
   components: {
@@ -258,7 +274,61 @@ export default {
   font-size: 24px;
 }
 /* channel结束 */
-
+/* 通知公告样式 */
+.newest {
+  position: absolute;
+  top: 134px;
+  left: 50%;
+  width: 690px;
+  height: 64px;
+  border-radius: 32px;
+  padding-left: 72px;
+  transform: translateX(-50%);
+  background: #fff;
+  box-sizing: border-box;
+}
+.newest .circle {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.2);
+}
+.newest .circle::after {
+  position: absolute;
+  content: "";
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #ff0000;
+  right: 0;
+  top: 0;
+}
+.newest .circle .icon-wj_ic_message {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+  color: #666;
+}
+.newest .news-title {
+  text-align: center;
+  letter-spacing: 2px;
+  color: #37cabe;
+  font-size: 28px;
+  height: 64px;
+  line-height: 64px;
+  left: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 通知公告样式结束 */
 .mapComponent {
   position: absolute;
   top: 88px;

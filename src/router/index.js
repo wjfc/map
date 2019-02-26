@@ -8,6 +8,7 @@ import BusDetail from "@/page/busDetail";
 import BusMapPreiview from "@/page/busMapPreview";
 import BusLineMapPreiview from "@/page/busLineMapPreview";
 import Notice from "@/page/notice";
+import NoticeInfo from "@/page/noticeInfo";
 import BusLines from "@/page/busLines";
 import BusLineInfo from "@/page/busLineInfo";
 
@@ -55,6 +56,11 @@ export default new Router({
       path: "/notice",
       name: "",
       component: Notice
+    },
+    {
+      path: "/noticeInfo",
+      name: "",
+      component: NoticeInfo
     },
     {
       path: "/busLines",
