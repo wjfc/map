@@ -43,7 +43,10 @@ export default {
       destination: "" //终点
     };
   },
-  mounted() {},
+  mounted() {
+    // 获取通知公告
+    this.ggjt_list();
+  },
   methods: {
     searchStation() {
       var self = this;
@@ -195,6 +198,12 @@ export default {
     drawStartAndEnd() {
       // 绘制起点
       // 绘制终点
+    },
+    // 获取通知公告
+    ggjt_list() {
+      apis.ggjt_list(function(res) {
+        console.log(res);
+      });
     }
   },
   components: {

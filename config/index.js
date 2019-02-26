@@ -30,6 +30,10 @@ module.exports = {
       "/wjtran": {
         target: "https://gjcx.smartwj.net:8999",
         changeOrigin: true //是否跨域
+      },
+      "/ggjt": {
+        target: "https://gjcx.smartwj.net:8999",
+        changeOrigin: true //是否跨域
       }
     },
     // https://webpack.js.org/configuration/devtool/#development

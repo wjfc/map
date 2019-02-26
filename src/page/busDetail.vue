@@ -189,6 +189,8 @@ export default {
       var mysegments = [];
       var segments = this.transits[this.activeIndex].segments;
       var via_stops = []; //中间停靠站信息
+      var via_stop_total_gd = 0;
+      var via_stop_total_wjgj = 0;
       segments.forEach((v, i) => {
         var obj = {};
         // 大于50米的才算步行逻辑
@@ -202,9 +204,11 @@ export default {
           via_stops = obj.buslines[0].via_stops;
           via_stops.push(obj.buslines[0].arrival_stop);
           via_stops.unshift(obj.buslines[0].departure_stop);
+          via_stop_total_gd += via_stops.length;
           obj.via_stops_modify = via_stops;
           var name = obj.buslines[0].name;
-          name = name.substr(0, name.indexOf("路"));
+          var reg = /[1-9][0-9]*/g;
+          name = name.match(reg)[0];
           var oldArray = via_stops;
           var url =
             "/wjtran/channel/match?" +
@@ -245,12 +249,36 @@ export default {
                   });
                 }
                 obj.via_stops_modify = tempObj;
+                via_stop_total_wjgj += obj.via_stops_modify.length;
               }
             },
             error: function(error) {}
           });
         }
-
+        // 设置总经历的站台数量
+        if (via_stop_total_gd == via_stop_total_wjgj) {
+          this.$set(
+            this.transits[this.activeIndex],
+            "totalStations",
+            via_stop_total_gd
+          );
+        } else if (
+          via_stop_total_gd != via_stop_total_wjgj &&
+          via_stop_total_wjgj != 0
+        ) {
+          this.$set(
+            this.transits[this.activeIndex],
+            "totalStations",
+            via_stop_total_wjgj
+          );
+        } else {
+          this.$set(
+            this.transits[this.activeIndex],
+            "totalStations",
+            via_stop_total_gd
+          );
+        }
+        // 设置总经历的站台数量end
         showFlag.push(false);
         mysegments.push(obj);
       });

@@ -6,7 +6,8 @@
     </div>
     <div class="bus" id="bus-normal" v-html="formatBus(this.v.segments)"></div>
     <div class="info">
-      <span>{{this.v.segments|formatStations}}</span>
+      <!-- <span>{{this.v.segments|formatStations}}</span> -->
+      <span>{{v.totalStations}}站</span>
       <span>.</span>
       <span>{{this.v.cost}}元</span>
       <span>.</span>
@@ -24,9 +25,7 @@ export default {
     };
   },
   props: ["v", "activeIndex", "mysegment"],
-  mounted() {
-    console.log(this.activeIndex);
-  },
+  mounted() {},
   methods: {
     //格式化公交换乘方案
     formatBus(v) {

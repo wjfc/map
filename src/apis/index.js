@@ -83,6 +83,19 @@ var matchChannel = function(params, callback) {
       callback(error);
     });
 };
+
+// 获取公交公司提供的通知公告信息列表
+var ggjt_list = function(callback) {
+  var url = "/ggjt/list";
+  instance
+    .get(url)
+    .then(function(res) {
+      callback(res);
+    })
+    .catch(function(error) {
+      callback(error);
+    });
+};
 // http://localhost:8080/wjtran/busInfo/find?lguids=0000000000LINELINEINFO15121021854704
 // http://localhost:8080/wjtran/channelStation/find?lguids=0000000000LINELINEINFO15121021854704
 export default {
@@ -91,5 +104,6 @@ export default {
   searchByKeyword: searchByKeyword,
   searchStationByRange: searchStationByRange,
   findChannelBySguids: findChannelBySguids,
-  matchChannel:matchChannel
+  matchChannel: matchChannel,
+  ggjt_list: ggjt_list
 };

@@ -173,7 +173,7 @@ export default {
             id: v.id
           }
         });
-      } else {
+      } else if(v.id == 'wjgj') {
         // 跳转到线路页面
         this.$router.push({
           path: "/busLines",
