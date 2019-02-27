@@ -99,6 +99,7 @@ export default {
       this.$refs.mapObj.map.add([marker]);
       this.$refs.mapObj.map.setFitView([marker]);
     },
+    // 路程较短时的展示
     showWalkTips() {
       this.walkingTips = true;
       var self = this;
@@ -109,6 +110,7 @@ export default {
         self.walkingTips = false;
       }, 3000);
     },
+    // 手动关闭提示框
     closeWalkingTips() {
       clearInterval(this.walkingTime);
       this.walkingTime = null;

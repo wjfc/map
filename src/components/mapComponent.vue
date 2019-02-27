@@ -1,7 +1,7 @@
 <template>
   <div class="mapBox">
     <div class="map" id="mapApp"></div>
-    <div class="mapError" v-if="mapErrorFlag" @click="mapInit">
+    <div class="mapError" v-if="mapErrorFlag" @click="refreshMap">
       <img src="../../static/images/networkError.png" alt>
     </div>
   </div>
@@ -62,7 +62,7 @@ export default {
           zoomToAccuracy: self.showFlags //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
         });
         self.map.addControl(geolocation);
-        // geolocation.getCurrentPosition();
+        // geolocation.getCurrentPosition();// 调用高德定位方法。
         AMap.event.addListener(geolocation, "complete", onComplete); //返回定位信息
         AMap.event.addListener(geolocation, "error", onError); //返回定位出错信息
         function onComplete(data) {
@@ -93,6 +93,9 @@ export default {
     },
     mapError() {
       this.mapErrorFlag = true;
+    },
+    refreshMap() {
+      window.location.reload();
     }
   }
 };
