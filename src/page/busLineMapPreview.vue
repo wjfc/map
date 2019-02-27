@@ -271,10 +271,10 @@ export default {
   box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.2);
   background-size: 100% 100%;
 }
-.amap-icon img {
+.busMap-preivew .amap-icon img {
   /* width: 24px !important;
   height: 24px !important; */
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
 }
 </style>

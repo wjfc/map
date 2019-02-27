@@ -49,7 +49,9 @@ export default {
       walkLine: null, //步行路线,
       origin: "", //起点
       destination: "", //终点
-      newestMessage: null
+      newestMessage: null, //通知公告
+      currentMarkIndex: 0, //当前点击状态的索引
+      lastMarkIndex: 0 //上一个点击状态的索引
     };
   },
   mounted() {
@@ -85,17 +87,35 @@ export default {
       }
       var self = this;
       this.stationMark.forEach((v, i) => {
-        var left = [-12, -38, -64, -94, -123, -150, -179, -207, -236, -263];
-        var startIcon = new AMap.Icon({
-          // 图标尺寸
-          size: new AMap.Size(19, 32),
-          // 图标的取图地址
-          image: "./static/images/mapicon_05.png",
-          // 图标所用图片大小
-          imageSize: new AMap.Size(290, 413),
-          // 图标取图偏移量
-          imageOffset: new AMap.Pixel(left[i], -123)
-        });
+        // var left = [-12, -38, -64, -94, -123, -150, -179, -207, -236, -263];
+        var left = -0.5 - i * 31.5;
+        if (
+          self.currentMarkIndex != self.lastMarkIndex &&
+          i == self.currentMarkIndex
+        ) {
+          var startIcon = new AMap.Icon({
+            // 图标尺寸
+            size: new AMap.Size(29, 39),
+            // 图标的取图地址
+            image: "./static/images/spring.png",
+            // 根据所设置的大小拉伸或压缩图片
+            imageSize: new AMap.Size(315, 83),
+            // 图标取图偏移量
+            imageOffset: new AMap.Pixel(left, -42)
+          });
+        } else {
+          var startIcon = new AMap.Icon({
+            // 图标尺寸
+            size: new AMap.Size(29, 39),
+            // 图标的取图地址
+            image: "./static/images/spring.png",
+            // 根据所设置的大小拉伸或压缩图片
+            imageSize: new AMap.Size(315, 83),
+            // 图标取图偏移量
+            imageOffset: new AMap.Pixel(left, -0.5)
+          });
+        }
+
         // 将 icon 传入 marker
         var startMarker = new AMap.Marker({
           position: new AMap.LngLat(
@@ -103,7 +123,7 @@ export default {
             this.stationMark[i].lat
           ),
           icon: startIcon,
-          offset: new AMap.Pixel(-10, -16)
+          offset: new AMap.Pixel(-15, -20)
         });
         startMarker.index = i;
         startMarker.on("click", function(e) {
@@ -114,6 +134,9 @@ export default {
             sguids: self.stationMark[index].sguid
           };
           apis.findChannelBySguids(params, function(res) {
+            self.lastMarkIndex = self.currentMarkIndex;
+            self.currentMarkIndex = index;
+            self.drawStationMark();
             self.showChannelInfo(res.data.records, index);
           });
         });
@@ -125,7 +148,9 @@ export default {
     // 清除点标记
     clearStationMark() {
       this.$refs.mapObj.map.remove(this.stationIcon);
+      this.stationIcon = [];
     },
+
     // 显示线路详情
     showChannelInfo(data, index) {
       var self = this;

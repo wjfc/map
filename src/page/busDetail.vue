@@ -63,7 +63,7 @@
               <!-- 车辆到站信息 -->
               <div class="bus-time">
                 <h3>{{v.buslines[0].name}}</h3>
-                <div class="nearestBus">
+                <div class="nearestBus" v-if="v.via_stops_modify[0].lfstdetime">
                   <span>最近一辆</span>
                   <span>{{findBusInfo(v.via_stops_modify[0])}}</span>
                   <span>站到达</span>
@@ -223,7 +223,11 @@ export default {
             type: "GET",
             async: false,
             success: function(res) {
-              var stations = res.record.station;
+              if (res.code == 0) {
+                var stations = res.record.station;
+              } else {
+                var stations = [];
+              }
               var startIndex = null;
               var endIndex = null;
               stations.forEach((v, i) => {
@@ -249,13 +253,14 @@ export default {
                   });
                 }
                 obj.via_stops_modify = tempObj;
-                via_stop_total_wjgj += obj.via_stops_modify.length;
               }
+              via_stop_total_wjgj += obj.via_stops_modify.length;
             },
             error: function(error) {}
           });
         }
         // 设置总经历的站台数量
+
         if (via_stop_total_gd == via_stop_total_wjgj) {
           this.$set(
             this.transits[this.activeIndex],
@@ -521,6 +526,7 @@ export default {
 }
 .bus-time h3 {
   color: #37cabe;
+  width: 75%;
   font-size: 30px;
 }
 .bus-time .nearestBus {
@@ -573,7 +579,7 @@ export default {
   display: flex;
   align-items: center;
   position: absolute;
-  top: 75px;
+  top: 36px;
   right: 30px;
   font-size: 28px;
   color: #666;

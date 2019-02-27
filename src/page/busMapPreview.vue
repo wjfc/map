@@ -156,23 +156,36 @@ export default {
     },
     // 绘制起点和终点
     drawStartAndEnd(obj) {
-      // 绘制起点
-      var startPosition = new AMap.Marker({
-        map: this.$refs.mapObj.map,
-        position: [this.origin.split(",")[0], this.origin.split(",")[1]], //基点位置
-        icon: "./static/images/startIcon.png",
-        zIndex: 10
+      var startIcon = new AMap.Icon({
+        size: new AMap.Size(29, 35), // 图标尺寸
+        image: "./static/images/startIcon.png", // Icon的图像
+        imageSize: new AMap.Size(29, 35) // 根据所设置的大小拉伸或压缩图片
       });
-      // 绘制终点
-      var endPosition = new AMap.Marker({
-        map: this.$refs.mapObj.map,
-        position: [
+      var startMarker = new AMap.Marker({
+        position: new AMap.LngLat(
+          this.origin.split(",")[0],
+          this.origin.split(",")[1]
+        ),
+        offset: new AMap.Pixel(-15, -18),
+        icon: startIcon,
+        zoom: 13
+      });
+      var endIcon = new AMap.Icon({
+        size: new AMap.Size(29, 35), // 图标尺寸
+        image: "./static/images/endIcon.png", // Icon的图像
+        imageSize: new AMap.Size(29, 35) // 根据所设置的大小拉伸或压缩图片
+      });
+      var endMarker = new AMap.Marker({
+        position: new AMap.LngLat(
           this.destination.split(",")[0],
           this.destination.split(",")[1]
-        ], //基点位置
-        icon: "./static/images/endIcon.png",
-        zIndex: 10
+        ),
+        offset: new AMap.Pixel(-15, -18),
+        icon: endIcon,
+        zoom: 13
       });
+      this.$refs.mapObj.map.add([startMarker, endMarker]);
+      this.$refs.mapObj.map.setFitView();
     },
     // /绘制乘车的路线
     getpolyline(obj) {
@@ -485,8 +498,10 @@ export default {
   box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.2);
   background-size: 100% 100%;
 }
-.amap-icon img {
-  width: 58px !important;
-  height: 70px !important;
+.busMap-preivew .amap-icon img {
+  /* width: 58px !important;
+  height: 70px !important; */
+  width: 100% !important;
+  height: 100% !important;
 }
 </style>

@@ -28,7 +28,6 @@
         </div>
       </li>
     </ul>
-    
   </div>
 </template>
 
@@ -101,6 +100,7 @@ export default {
 }
 .buslineBox {
   width: 100%;
+  background: #fff;
 }
 .buslineItem {
   display: flex;
@@ -141,6 +141,6 @@ export default {
 .mapPreview {
   position: fixed;
   left: 567px;
-  bottom: 127px;
+  bottom: 115px;
 }
 </style>
