@@ -92,7 +92,6 @@ export default {
           pageSize: 12
         };
         apis.findChannelBySguids(params, function(res) {
-          console.log(res.data.records);
           var historyList = [];
           var records = res.data.records;
           records.forEach((v, i) => {
@@ -122,7 +121,7 @@ export default {
           var historyList = [];
           var tips = res.data.tips;
           tips.forEach((v, i) => {
-            if (v.adcode == "320509") {
+            if (v.adcode == "320509" && v.location.length > 0) {
               historyList.push(v);
             }
           });
