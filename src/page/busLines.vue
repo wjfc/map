@@ -6,7 +6,7 @@
     </div>
     <ul class="buslineBox">
       <li class="buslineItem" v-for="(v,i) in busList" :key="i" @click="goBusLinesInfo(i)">
-        <h3>{{options.name}}</h3>
+        <h3>{{v.lname}}路</h3>
         <div class="direction">
           <span>{{v.station[0].sname}}</span>
           <i class="icon-wj_ic_diraction"></i>
@@ -21,7 +21,7 @@
             <img src="../../static/images/end.png" alt>
             <span>{{v.lfstdetime}}</span>
           </div>
-          <div>
+          <div v-if="v.station[0].price">
             <span>.</span>
             <span>票价{{v.station[0].price}}元</span>
           </div>
@@ -66,11 +66,13 @@ export default {
       var self = this;
       var params = {
         lname: this.options.lname,
-        pageSize: 12,
         includeStation: true
       };
       apis.findChannelBySguids(params, function(res) {
         self.busList = res.data.records;
+        self.busList = self.busList.filter(v => {
+          return v.lname == params.lname;
+        });
       });
     },
     goBusLinesInfo(i) {

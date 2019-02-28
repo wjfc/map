@@ -47,8 +47,9 @@
           <div
             class="busline baseline solid"
             v-if="departure_stop(v,i)"
-            @click="goBusMapPreview(i,'busline')"
+            @click="goBusMapPreviewOrBusLineInfo(i,'busline',v)"
           >
+            <!--   @click="goBusMapPreview(i,'busline')" -->
             <!-- 公交车起点 -->
             <div
               class="bus-departure_stop leftIcon"
@@ -208,7 +209,7 @@ export default {
           obj.via_stops_modify = via_stops;
           var name = obj.buslines[0].name;
           var reg = /[1-9][0-9]*/g;
-          name = name.match(reg)[0];
+          name = name.match(reg) ? name.match(reg)[0] : name;
           var oldArray = via_stops;
           var url =
             "/wjtran/channel/match?" +
@@ -241,6 +242,7 @@ export default {
               // 如果存在则显示公交公司提供的数据
               if (startIndex && endIndex) {
                 var tempObj = [];
+
                 for (var j = startIndex; j <= endIndex; j++) {
                   tempObj.push({
                     name: stations[j].sname,
@@ -249,7 +251,9 @@ export default {
                     lguid: stations[j].lguid,
                     sguid: stations[j].sguid,
                     lfstdftime: res.record.lfstdftime,
-                    lfstdetime: res.record.lfstdetime
+                    lfstdetime: res.record.lfstdetime,
+                    isMain: res.record.isMain,
+                    lname: res.record.lname
                   });
                 }
                 obj.via_stops_modify = tempObj;
@@ -389,6 +393,25 @@ export default {
           point: point
         }
       });
+    },
+    goBusMapPreviewOrBusLineInfo(i, str, obj) {
+      var temp = obj.via_stops_modify[0];
+      console.log(temp);
+      if (temp.lguid) {
+        //  如果匹配上吴江公交的数据
+        this.$router.push({
+          path: "/busLineInfo",
+          query: {
+            name: temp.lname + "路",
+            lname: temp.lname,
+            lguid: temp.lguid,
+            isMain: temp.isMain,
+            focusIndex: ""
+          }
+        });
+      } else {
+        this.goBusMapPreview(i, str);
+      }
     }
   },
   computed: {

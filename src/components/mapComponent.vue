@@ -34,11 +34,8 @@ export default {
       this.mapErrorFlag = false;
       this.map.setCity(baseConstant.adname); //定位到城市。
       var self = this;
-      self.changeNowLocation("120.638966" + "," + "31.151753"); //临时定位到吴江广播电视台
-      if (this.dataFrom == "home") {
-        // 如果是主页，则调用吴江公交，搜索最近的车站接口
-        this.$emit("wjtran_search");
-      }
+      // self.changeNowLocation("120.638966" + "," + "31.151753"); //临时定位到吴江广播电视台
+
       AMap.plugin(["AMap.ToolBar", "AMap.Geolocation"], function() {
         var toolbar = new AMap.ToolBar({});
         self.map.addControl(toolbar);
@@ -55,28 +52,37 @@ export default {
             //自定义定位点样式，同Marker的Options
             offset: new AMap.Pixel(-16, -16),
             content:
-              '<img src="../../static/images/location.png" style="width:36px;height:36px" id="locationIcon"/>'
+              '<img src="./static/images/location.png" style="width:36px;height:36px" id="locationIcon"/>'
           },
           showCircle: true, //定位成功后用圆圈表示定位精度范围，默认：true
           panToLocation: self.showFlags, //定位成功后将定位到的位置作为地图中心点，默认：true
           zoomToAccuracy: self.showFlags //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
         });
         self.map.addControl(geolocation);
-        // geolocation.getCurrentPosition();// 调用高德定位方法。
+        geolocation.getCurrentPosition(); // 调用高德定位方法。
+
         AMap.event.addListener(geolocation, "complete", onComplete); //返回定位信息
         AMap.event.addListener(geolocation, "error", onError); //返回定位出错信息
         function onComplete(data) {
           // 需要保存位置信息
-          console.log(data);
+          // console.log(data);
           var posX = data.position.getLng();
           var poxY = data.position.getLat();
-          //self.$store.commit("changeNowLocation", posX + "," + poxY);
+          self.$store.commit("changeNowLocation", posX + "," + poxY);
           self.changeNowLocation(posX + "," + poxY);
+          if (self.dataFrom == "home") {
+            // 如果是主页，则调用吴江公交，搜索最近的车站接口
+            self.$emit("wjtran_search");
+          }
         }
         function onError(data) {
           console.log(data);
           // 地图加载失败时，友好提示。
           // self.mapError();
+          if (self.dataFrom == "home") {
+            // 如果是主页，则调用吴江公交，搜索最近的车站接口
+            self.$emit("wjtran_search");
+          }
         }
         document
           .getElementsByClassName("amap-geolocation-con")[0]

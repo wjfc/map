@@ -4,6 +4,7 @@
       <div class="destation">
         <div class="backArrow icon-wj_ic_back" @click="goBack()"></div>
         <p>{{options.name}}</p>
+        <img src="../../static/images/home2.png" alt @click="home()">
       </div>
       <ul class="strategy">
         <li
@@ -93,6 +94,11 @@ export default {
     goBack() {
       this.$router.back();
     },
+    home() {
+      this.$router.push({
+        path: "/"
+      });
+    },
     // 点击跳转到公交地图页面
     goBusMap(i) {
       var self = this;
@@ -141,7 +147,7 @@ export default {
   position: absolute;
   left: 50%;
   transform: translate(-50%);
-  width: 80%;
+  width: 600px;
   height: 88px;
   text-align: center;
   line-height: 88px;
@@ -149,6 +155,14 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.road header div.destation img {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translate(0, -50%);
+  width: 40px;
+  height: 40px;
 }
 .road .backArrow {
   position: absolute;

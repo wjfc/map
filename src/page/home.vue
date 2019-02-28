@@ -21,12 +21,14 @@
       </div>
     </div>
     <div class="newest" v-if="newestMessage">
-      <router-link to="/notice">
-        <div class="circle">
-          <i class="icon-wj_ic_message"></i>
-        </div>
-        <div class="news-title">{{newestMessage.title}}</div>
-      </router-link>
+      <div class="circle" :class="{noRead:noRead}" @click="goNotice(newestMessage.id)">
+        <i class="icon-wj_ic_message"></i>
+      </div>
+      <div
+        class="news-title"
+        v-if="noRead"
+        @click="goNotice(newestMessage.id)"
+      >{{newestMessage.title}}</div>
     </div>
   </div>
 </template>
@@ -51,7 +53,8 @@ export default {
       destination: "", //终点
       newestMessage: null, //通知公告
       currentMarkIndex: 0, //当前点击状态的索引
-      lastMarkIndex: 0 //上一个点击状态的索引
+      lastMarkIndex: 0, //上一个点击状态的索引
+      noRead: true //判断没有读取过最新的资讯信息
     };
   },
   mounted() {
@@ -242,9 +245,22 @@ export default {
           pageSize: 1
         },
         function(res) {
+          var newestId = localStorage.getItem("newestId") || null;
           self.newestMessage = res.data.result.list[0];
+          if (newestId == self.newestMessage.id) {
+            self.noRead = false;
+          } else {
+            self.noRead = true;
+          }
         }
       );
+    },
+    goNotice(id) {
+      // 跳转到通知列表页面
+      localStorage.setItem("newestId", id);
+      this.$router.push({
+        path: "/notice"
+      });
     }
   },
   components: {
@@ -306,11 +322,9 @@ export default {
   left: 50%;
   width: 690px;
   height: 64px;
-  border-radius: 32px;
-  padding-left: 72px;
+
   transform: translateX(-50%);
-  background: #fff;
-  box-sizing: border-box;
+  background: transparent;
 }
 .newest .circle {
   position: absolute;
@@ -324,6 +338,7 @@ export default {
   box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.2);
 }
 .newest .circle::after {
+  visibility: hidden;
   position: absolute;
   content: "";
   width: 16px;
@@ -332,6 +347,9 @@ export default {
   background-color: #ff0000;
   right: 0;
   top: 0;
+}
+.newest .circle.noRead::after {
+  visibility: visible;
 }
 .newest .circle .icon-wj_ic_message {
   position: absolute;
@@ -352,6 +370,13 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  background: #fff;
+  border-radius: 32px;
+  padding-left: 72px;
+  box-sizing: border-box;
+}
+.newest .news-title.noRead {
+  display: none;
 }
 /* 通知公告样式结束 */
 .mapComponent {

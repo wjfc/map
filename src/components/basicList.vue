@@ -6,8 +6,8 @@
     </div>
     <div class="bus" id="bus-normal" v-html="formatBus(this.v.segments)"></div>
     <div class="info">
-      <!-- <span>{{this.v.segments|formatStations}}</span> -->
-      <span>{{v.totalStations}}站</span>
+      <span v-if="!v.totalStations">{{this.v.segments|formatStations}}</span>
+      <span v-if="v.totalStations">{{v.totalStations}}站</span>
       <span>.</span>
       <span>{{this.v.cost}}元</span>
       <span>.</span>

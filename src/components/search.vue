@@ -88,8 +88,7 @@ export default {
         // 纯数字调用吴江公交接口
         // 吴江公交搜索接口
         var params = {
-          lname: this.searchContent,
-          pageSize: 12
+          lname: this.searchContent
         };
         apis.findChannelBySguids(params, function(res) {
           var historyList = [];
@@ -310,12 +309,14 @@ input {
   position: absolute;
   top: 88px;
   width: 100%;
-  max-height: 1194px;
+  max-height: 1040px;
   background: #fff;
   z-index: 10000;
 }
 .lists {
   width: 100%;
+  height: 960px;
+  overflow: scroll;
 }
 .lists li {
   width: 100%;

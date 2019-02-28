@@ -3,6 +3,7 @@
     <header>
       <div class="backArrow icon-wj_ic_back" @click="goBack()"></div>
       <p>{{desName}}</p>
+      <img src="../../static/images/home2.png" alt @click="home()">
     </header>
   </div>
 </template>
@@ -19,6 +20,11 @@ export default {
   methods: {
     goBack() {
       this.$router.back();
+    },
+    home() {
+      this.$router.push({
+        path: "/"
+      });
     }
   },
   props: ["desName"]
@@ -41,7 +47,7 @@ export default {
   position: absolute;
   left: 50%;
   transform: translate(-50%);
-  width: 80%;
+  width: 600px;
   height: 88px;
   text-align: center;
   line-height: 88px;
@@ -49,6 +55,14 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.basicHeader header img {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translate(0, -50%);
+  width: 40px;
+  height: 40px;
 }
 .basicHeader .backArrow {
   position: absolute;

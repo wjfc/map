@@ -27,7 +27,7 @@
                     <img src="../../static/images/end.png" alt>
                     <span>{{v.lfstdetime}}</span>
                   </div>
-                  <div>
+                  <div v-if="v.station[0].price">
                     <span>.</span>
                     <span>票价{{v.station[0].price}}元</span>
                   </div>
@@ -87,7 +87,12 @@ export default {
       focusIndex: this.$route.query.focusIndex
     };
     this.msg = this.options.name;
-    this.activeIndex = Number(this.options.focusIndex);
+    if (this.options.focusIndex) {
+      this.activeIndex = Number(this.options.focusIndex);
+    } else {
+      this.activeIndex = null;
+    }
+
     this.getBusList();
   },
   methods: {
@@ -96,11 +101,21 @@ export default {
       var self = this;
       var params = {
         lname: this.options.lname,
-        pageSize: 12,
         includeStation: true
       };
       apis.findChannelBySguids(params, function(res) {
         self.busList = res.data.records;
+        self.busList = self.busList.filter(v => {
+          return v.lname == params.lname;
+        });
+        if (!self.activeIndex) {
+          self.busList.forEach((v, i) => {
+            if (self.options.lguid == v.lguid) {
+              self.activeIndex = i;
+              return;
+            }
+          });
+        }
         self.getStationList();
         self.swiper.slideTo(self.activeIndex, 0, function() {});
       });
