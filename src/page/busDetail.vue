@@ -323,7 +323,7 @@ export default {
         success: function(res) {
           records = res.records;
           records.forEach((v, i) => {
-            if (v.lastSlno < slno) {
+            if (v.lastSlno <= slno) {
               var lastNum;
               lastNum = slno - v.lastSlno;
               lastArr.push(lastNum);

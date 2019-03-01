@@ -1,5 +1,5 @@
 <template>
-  <div class="busCode">
+  <div class="busCode" @click="tapBusCode">
     <i class="icon-wj_ic_ecord"></i>
     <p>乘车码</p>
   </div>
@@ -13,7 +13,11 @@ export default {
       msg: "乘车码按钮"
     };
   },
-  methods: {}
+  methods: {
+    tapBusCode() {
+      window.location.href = "https://app.smartwj.net:10029/h5/citizenCard/#/";
+    }
+  }
 };
 </script>
 

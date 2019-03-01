@@ -45,11 +45,21 @@
     </div>
     <div class="buslines-content">
       <ul>
-        <li v-for="(v,i) in stationList" :key="i">
-          <i v-if="v.busIcon" class="hasBusIcon"></i>
-          <p>{{v.sname}}</p>
+        <li
+          v-for="(v,i) in stationList"
+          :key="i"
+          :class="{hasBusIcon:v.busIcon}"
+          @click="stationFocus(v,i)"
+        >
+          <p :class="{active:statinonIndex === i}">{{v.sname}}</p>
         </li>
       </ul>
+    </div>
+    <div class="buslines-totast-mask" v-show="totastMaskShow">
+      <div class="buslines-totast">
+        <p>{{totastContent}}</p>
+        <div @click="closeTotastMaskShow">知道了</div>
+      </div>
     </div>
   </div>
 </template>
@@ -79,6 +89,11 @@ export default {
       },
       busList: [], //公交车双向列表
       stationList: [], //站的列表
+      statinonIndex: null, //点击车站列表的元素的索引
+      showMessageNum: null, //展示距离选择的车站最近的车辆位置
+      totastMaskShow: false,
+      totastContent: "",
+      findBusInfo_timer: null, //开始定时器找寻线路上的所有车辆
       busLastSlon: [] //线路上所有公交车停靠的站台位置索引
     };
   },
@@ -126,12 +141,20 @@ export default {
     },
     // 获取站台列表
     getStationList() {
+      var self = this;
       this.stationList = this.busList[this.activeIndex].station;
       this.stationList.forEach((v, i) => {
         v.busIcon = false;
       });
-
       this.findBusInfo();
+      if (this.findBusInfo_timer) {
+        clearInterval(this.findBusInfo_timer);
+        this.findBusInfo_timer = null;
+      } else {
+        this.findBusInfo_timer = setInterval(() => {
+          self.findBusInfo();
+        }, 60000);
+      }
     },
     //
     // 跳转到公交线路地图详情页面
@@ -152,19 +175,56 @@ export default {
       var params = {
         lguids: this.busList[this.activeIndex].lguid
       };
-
+      this.stationList.forEach((v, i) => {
+        v.busIcon = false;
+      });
       apis.findBusInfo(params, ({ data }) => {
         var records = data.records;
         records.forEach((v, i) => {
           busLastSlon.push(v.lastSlno);
           self.$set(self.stationList[v.lastSlno - 1], "busIcon", true);
         });
+        this.busLastSlon = busLastSlon;
         self.$forceUpdate();
       });
     },
     slideChangeTransitionEnd() {
       this.activeIndex = this.swiper.activeIndex;
       this.getStationList();
+    },
+    stationFocus(v, i) {
+      this.statinonIndex = i;
+      var slno = v.slno;
+      var lastArr = [];
+      this.busLastSlon.forEach((v, i) => {
+        if (v <= slno) {
+          lastArr.push(slno - v);
+        }
+      });
+      if (lastArr.length > 0) {
+        this.showMessageNum = Math.min.apply(null, lastArr);
+      } else {
+        this.showMessageNum = null;
+      }
+
+      this.showTotast();
+    },
+    showTotast() {
+      // console.log(this.showMessageNum);
+      if (this.showMessageNum > 0) {
+        this.totastContent =
+          "距离您选中的车站，最近的车辆还有" + this.showMessageNum + "站到达。";
+      } else if (this.showMessageNum == 0) {
+        this.totastContent = "车辆已经过本站，请抓紧时间乘车！";
+      } else {
+        this.totastContent = "暂未查询到发站的车辆！";
+      }
+
+      this.totastMaskShow = true;
+    },
+    closeTotastMaskShow() {
+      this.totastMaskShow = false;
+      this.totastContent = "";
     }
   },
   components: {
@@ -257,13 +317,11 @@ export default {
 
 .buslines-content li {
   position: relative;
-  font-weight: bold;
-  color: #212121;
   padding-left: 39px;
-  font-size: 30px;
   height: 90px;
   line-height: 90px;
 }
+
 .buslines-content li::before {
   position: absolute;
   top: 50%;
@@ -287,15 +345,19 @@ export default {
   background: #37cabe;
   z-index: 1;
 }
-.buslines-content li .hasBusIcon {
+
+.buslines-content li.hasBusIcon::before {
   position: absolute;
-  left: -66px;
+  left: -22px;
   top: 50%;
   transform: translateY(-50%);
   width: 44px;
   height: 44px;
- background: url('../../static/images/busIcon.png') no-repeat;
- background-size: 100% 100%;
+  background: url("../../static/images/busIcon.png") no-repeat;
+  background-size: 100% 100%;
+  border: 0px solid rgba(15, 200, 153, 1) !important;
+  content: "";
+  z-index: 999;
 }
 .buslines-content li:last-child::before {
   border: 4px solid #fd3232;
@@ -307,5 +369,49 @@ export default {
 .buslines-content li:last-child:after {
   height: 50%;
 }
+
+.buslines-content li p {
+  font-weight: bold;
+  font-size: 30px;
+  color: #212121;
+}
+.buslines-content li p.active {
+  color: #f86c51;
+}
 /* 站点展示部分end */
+/* 弹窗部分 */
+.buslines-totast-mask {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+.buslines-totast {
+  position: fixed;
+  z-index: 5000;
+  width: 80%;
+  max-width: 600px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  text-align: center;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.buslines-totast p {
+  padding: 50px 40px;
+  font-size: 30px;
+  line-height: 1.3;
+  border-bottom: 2px solid #f2f2f2;
+}
+.buslines-totast div {
+  font-size: 32px;
+  line-height: 96px;
+  color: rgba(15, 200, 153, 1);
+}
+/* 弹窗结束 */
 </style>

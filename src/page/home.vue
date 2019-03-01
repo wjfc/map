@@ -90,8 +90,6 @@ export default {
       }
       var self = this;
       this.stationMark.forEach((v, i) => {
-        // var left = [-12, -38, -64, -94, -123, -150, -179, -207, -236, -263];
-        var left = -0.5 - i * 31.5;
         if (
           self.currentMarkIndex != self.lastMarkIndex &&
           i == self.currentMarkIndex
@@ -100,22 +98,19 @@ export default {
             // 图标尺寸
             size: new AMap.Size(29, 39),
             // 图标的取图地址
-            image: "./static/images/spring.png",
+            image: "./static/images/red.png",
             // 根据所设置的大小拉伸或压缩图片
-            imageSize: new AMap.Size(315, 83),
+            imageSize: new AMap.Size(29, 39)
             // 图标取图偏移量
-            imageOffset: new AMap.Pixel(left, -42)
           });
         } else {
           var startIcon = new AMap.Icon({
             // 图标尺寸
             size: new AMap.Size(29, 39),
             // 图标的取图地址
-            image: "./static/images/spring.png",
+            image: "./static/images/green.png",
             // 根据所设置的大小拉伸或压缩图片
-            imageSize: new AMap.Size(315, 83),
-            // 图标取图偏移量
-            imageOffset: new AMap.Pixel(left, -0.5)
+            imageSize: new AMap.Size(29, 39)
           });
         }
 
