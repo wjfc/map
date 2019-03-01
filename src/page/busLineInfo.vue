@@ -45,7 +45,10 @@
     </div>
     <div class="buslines-content">
       <ul>
-        <li v-for="(v,i) in stationList" :key="i" @click="goBusLineMapPreview(i)">{{v.sname}}</li>
+        <li v-for="(v,i) in stationList" :key="i">
+          <i v-if="v.busIcon" class="hasBusIcon"></i>
+          <p>{{v.sname}}</p>
+        </li>
       </ul>
     </div>
   </div>
@@ -75,7 +78,8 @@ export default {
         activeIndex: 0
       },
       busList: [], //公交车双向列表
-      stationList: [] //站的列表
+      stationList: [], //站的列表
+      busLastSlon: [] //线路上所有公交车停靠的站台位置索引
     };
   },
   mounted() {
@@ -123,7 +127,13 @@ export default {
     // 获取站台列表
     getStationList() {
       this.stationList = this.busList[this.activeIndex].station;
+      this.stationList.forEach((v, i) => {
+        v.busIcon = false;
+      });
+
+      this.findBusInfo();
     },
+    //
     // 跳转到公交线路地图详情页面
     goBusLineMapPreview(i) {
       this.$router.push({
@@ -133,6 +143,23 @@ export default {
           lguid: this.busList[this.activeIndex].lguid,
           focusIndex: i
         }
+      });
+    },
+    findBusInfo() {
+      var self = this;
+      var busLastSlon = [];
+      var new_stationList = self.stationList;
+      var params = {
+        lguids: this.busList[this.activeIndex].lguid
+      };
+
+      apis.findBusInfo(params, ({ data }) => {
+        var records = data.records;
+        records.forEach((v, i) => {
+          busLastSlon.push(v.lastSlno);
+          self.$set(self.stationList[v.lastSlno - 1], "busIcon", true);
+        });
+        self.$forceUpdate();
       });
     },
     slideChangeTransitionEnd() {
@@ -259,6 +286,16 @@ export default {
   height: 100%;
   background: #37cabe;
   z-index: 1;
+}
+.buslines-content li .hasBusIcon {
+  position: absolute;
+  left: -66px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+ background: url('../../static/images/busIcon.png') no-repeat;
+ background-size: 100% 100%;
 }
 .buslines-content li:last-child::before {
   border: 4px solid #fd3232;

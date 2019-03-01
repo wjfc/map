@@ -396,7 +396,7 @@ export default {
     },
     goBusMapPreviewOrBusLineInfo(i, str, obj) {
       var temp = obj.via_stops_modify[0];
-      console.log(temp);
+
       if (temp.lguid) {
         //  如果匹配上吴江公交的数据
         this.$router.push({

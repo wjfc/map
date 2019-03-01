@@ -83,7 +83,20 @@ var matchChannel = function(params, callback) {
       callback(error);
     });
 };
-
+// 按条件查询车辆信息对象
+var findBusInfo = function(params, callback) {
+  var url = "/wjtran/busInfo/find";
+  instance
+    .get(url, {
+      params: params
+    })
+    .then(function(res) {
+      callback(res);
+    })
+    .catch(function(error) {
+      callback(error);
+    });
+};
 // 获取公交公司提供的通知公告信息列表
 var ggjt_list = function(params, callback) {
   var url = "/ggjt/list";
@@ -119,6 +132,7 @@ export default {
   searchStationByRange: searchStationByRange,
   findChannelBySguids: findChannelBySguids,
   matchChannel: matchChannel,
+  findBusInfo:findBusInfo,
   ggjt_list: ggjt_list,
   ggjt_info: ggjt_info
 };
