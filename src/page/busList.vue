@@ -29,7 +29,7 @@ import apis from "@/apis/index.js";
 import baseConstant from "@/constant/index.js";
 import basicList from "@/components/basicList";
 export default {
-  name: "roadInfo",
+  name: "busList",
   data() {
     return {
       msg: "路线详情",

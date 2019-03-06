@@ -315,7 +315,7 @@ input {
 }
 .lists {
   width: 100%;
-  height: 960px;
+  max-height: 960px;
   overflow: scroll;
 }
 .lists li {

@@ -35,9 +35,11 @@
 import basicHeader from "@/components/basicHeader"; //通用头部组件
 import mapPreview from "@/components/mapPreview";
 import baseConstant from "@/constant/index.js";
+import utils from "@/utils/index.js";
 import apis from "@/apis/index.js";
+
 export default {
-  name: "buslines",
+  name: "busLines",
   data() {
     return {
       msg: "",
@@ -45,6 +47,7 @@ export default {
       busList: [] //公交车双向列表
     };
   },
+  created() {},
   mounted() {
     this.options = {
       name: this.$route.query.lname + "路",

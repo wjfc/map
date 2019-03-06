@@ -71,12 +71,15 @@ import basicHeader from "@/components/basicHeader"; //通用头部组件
 import basicList from "@/components/basicList";
 import mapPreview from "@/components/mapPreview";
 import transcode from "@/components/transCode";
+import utils from "@/utils/index.js";
+import $ from "jquery";
 import { swiper, swiperSlide } from "vue-awesome-swiper"; //swiper轮播效果
 export default {
-  name: "busLines_info",
+  name: "busLineInfo",
   data() {
     return {
       msg: "",
+      code: "",
       options: {},
       activeIndex: 0,
       swiperOption: {
@@ -105,6 +108,7 @@ export default {
       isMain: this.$route.query.isMain,
       focusIndex: this.$route.query.focusIndex
     };
+
     this.msg = this.options.name;
     if (this.options.focusIndex) {
       this.activeIndex = Number(this.options.focusIndex);
@@ -114,6 +118,7 @@ export default {
 
     this.getBusList();
   },
+  updated() {},
   methods: {
     // 获取公交车列表
     getBusList() {
@@ -143,6 +148,7 @@ export default {
     getStationList() {
       var self = this;
       this.stationList = this.busList[this.activeIndex].station;
+      this.statinonIndex = null;
       this.stationList.forEach((v, i) => {
         v.busIcon = false;
       });

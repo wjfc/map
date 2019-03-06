@@ -15,61 +15,67 @@ import BusLineInfo from "@/page/busLineInfo";
 Vue.use(Router);
 
 export default new Router({
-  mode: "hash",
+  mode: "history",
+  base: "/dist/",
   routes: [
     {
       path: "/",
-      name: "",
+      name: "home",
+      component: Home
+    },
+    {
+      path: "/index.html",
+      name: "home",
       component: Home
     },
     {
       path: "/buslist",
-      name: "",
+      name: "busList",
       component: Buslist
     },
     {
       path: "/destation",
-      name: "",
+      name: "destation",
       component: Destation
     },
     {
       path: "/busmap",
-      name: "",
+      name: "busMap",
       component: BusMap
     },
     {
       path: "/busDetail",
-      name: "",
+      name: "busDetail",
       component: BusDetail
     },
     {
       path: "/busMapPreview",
-      name: "",
+      name: "busMapPreview",
       component: BusMapPreiview
     },
     {
       path: "/busLineMapPreview",
-      name: "",
+      name: "busLineMapPreview",
       component: BusLineMapPreiview
     },
     {
       path: "/notice",
-      name: "",
+      name: "notice",
       component: Notice
     },
     {
       path: "/noticeInfo",
-      name: "",
+      name: "noticeInfo",
       component: NoticeInfo
     },
     {
       path: "/busLines",
-      name: "",
+      name: "busLines",
       component: BusLines
     },
     {
       path: "/busLineInfo",
-      name: "",
+      name: "busLineInfo",
       component: BusLineInfo
     }
   ]

@@ -38,11 +38,14 @@ import search from "@/components/search"; //搜索框
 import history from "@/components/history"; //历史记录框
 import mapComponent from "@/components/mapComponent"; //首页地图组件
 import baseConstant from "@/constant/index.js";
+import utils from "@/utils/index.js";
 import apis from "@/apis/index.js";
+
 export default {
   name: "home",
   data() {
     return {
+      code: null,
       dataFrom: "home",
       showChannel: false,
       stationInfo: {}, //站台信息
@@ -57,8 +60,18 @@ export default {
       noRead: true //判断没有读取过最新的资讯信息
     };
   },
+  created() {},
   mounted() {
-    // 获取通知公告
+    console.log(window.location.href);
+    this.code = window.location.search.substr(1).split("=")[1];
+    var smcode = localStorage.getItem("smcode");
+    if (this.code && this.code !== smcode) {
+      localStorage.setItem("smcode", this.code);
+    } else {
+      this.code = smcode;
+    }
+
+    this.getUserid();
     this.ggjt_list();
   },
   methods: {
@@ -255,6 +268,21 @@ export default {
       localStorage.setItem("newestId", id);
       this.$router.push({
         path: "/notice"
+      });
+    },
+    getUserid() {
+      // 测试版先获取token，然后再去获取userid
+      var self = this;
+      var code = localStorage.getItem("smcode");
+      var params = {
+        client_id: baseConstant.smAppid,
+        client_secret: baseConstant.smAppSecret,
+        code: code,
+        grant_type: "authorization_code",
+        redirect_uri: baseConstant.redirect_uri
+      };
+      apis.getSmToken(params, function(res) {
+        console.log(res);
       });
     }
   },

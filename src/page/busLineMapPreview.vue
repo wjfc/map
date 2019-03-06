@@ -28,7 +28,7 @@ import basicHeader from "@/components/basicHeader"; //通用头部组件
 import mapComponent from "@/components/mapComponent"; //地图组件
 import { swiper, swiperSlide } from "vue-awesome-swiper"; //swiper轮播效果
 export default {
-  name: "busMap",
+  name: "busLineMapPreview",
   data() {
     return {
       msg: "公交线路站台点标记",
