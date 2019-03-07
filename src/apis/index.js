@@ -1,4 +1,5 @@
 import axios from "axios";
+import $ from "jquery";
 import hmacSha256 from "../utils/hmacSha256.js";
 import baseConstant from "../constant/index.js";
 var instance = axios.create({});
@@ -160,10 +161,9 @@ var getSmToken = function(params, callback) {
     ",Signature=" +
     singnString +
     "";
-  console.log(queryString);
-  console.log(Auth);
+
   instance
-    .post(url, params, {
+    .post(url, queryString, {
       headers: {
         Authorization: Auth
       }
@@ -176,6 +176,39 @@ var getSmToken = function(params, callback) {
       obj.failure = true;
       callback(obj);
     });
+};
+var getSmToken2 = function(params, callback) {
+  // 获取签名和认证
+  var queryString = "";
+  for (var k in params) {
+    queryString += k + "=" + params[k] + "&";
+  }
+  queryString = queryString.substr(0, queryString.length - 1);
+  var dateString = hmacSha256.getFilterTime();
+  var singnString = hmacSha256.hmacSha256(queryString, dateString, "POST");
+  var url = "/service/api/66bfc0f090ad41e497d1f28aa6ef3318/oauth2/token";
+  var Auth =
+    "Digest Algorithm=HMAC-SHA256,AccessKeyId=" +
+    baseConstant.smAppid +
+    ",TimeStamp=" +
+    dateString +
+    ",Signature=" +
+    singnString +
+    "";
+  $.ajax({
+    url: url + "?" + queryString,
+    type: "post",
+    dataType: "json",
+    headers: {
+      Authorization: Auth
+    },
+    success: function(res) {
+      callback(res);
+    },
+    error: function(e) {
+      callback(e);
+    }
+  });
 };
 var getSmUserid = function(params, callback) {
   var url =
@@ -190,6 +223,68 @@ var getSmUserid = function(params, callback) {
     .catch(function(error) {
       callback(error);
     });
+};
+var getSmUserid2 = function(params, callback) {
+  var queryString = "";
+  for (var k in params) {
+    queryString += k + "=" + params[k] + "&";
+  }
+  queryString = queryString.substr(0, queryString.length - 1);
+  var dateString = hmacSha256.getFilterTime();
+  var singnString = hmacSha256.hmacSha256(queryString, dateString, "GET");
+  var url =
+    "/service/api/ecd5b7a70e6c49bc93cbd28d843b0983/openApi/user/getDetailedNormalUser";
+  var Auth =
+    "Digest Algorithm=HMAC-SHA256,AccessKeyId=" +
+    baseConstant.smAppid +
+    ",TimeStamp=" +
+    dateString +
+    ",Signature=" +
+    singnString +
+    "";
+  $.ajax({
+    url: url + "?" + queryString,
+    type: "get",
+    dataType: "json",
+    headers: {
+      Authorization: Auth
+    },
+    success: function(res) {
+      callback(res);
+    },
+    error: function(e) {
+      callback(e);
+    }
+  });
+};
+var sendMsg2 = function(obj, callback) {
+  var url = "/Message/send";
+  var timeStamp = new Date().getTime();
+  var params = {
+    appId: baseConstant.mesAppid,
+    toUserId: obj.toUserId,
+    messageType: "text",
+    title: obj.title,
+    text: obj.text,
+    timeStamp: timeStamp
+  };
+  var queryString = "";
+  for (var k in params) {
+    queryString += k + "=" + params[k] + "&";
+  }
+  queryString = queryString.substr(0, queryString.length - 1);
+  var singnString = hmacSha256.hmacSha256(queryString, timeStamp, "POST");
+  queryString += "&sign=" + singnString;
+  $.ajax({
+    url: url + "?" + queryString,
+    type: "post",
+    success: function(res) {
+      callback(res);
+    },
+    error: function(e) {
+      callback(e);
+    }
+  });
 };
 
 // http://localhost:8080/wjtran/busInfo/find?lguids=0000000000LINELINEINFO15121021854704
@@ -208,5 +303,8 @@ export default {
   ggjt_info: ggjt_info,
   getSmCode: getSmCode,
   getSmToken: getSmToken,
-  getSmUserid: getSmUserid
+  getSmToken2: getSmToken2,
+  getSmUserid: getSmUserid,
+  getSmUserid2: getSmUserid2,
+  sendMsg2: sendMsg2
 };

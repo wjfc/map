@@ -78,6 +78,7 @@ export default {
   name: "busLineInfo",
   data() {
     return {
+      userid: null,
       msg: "",
       code: "",
       options: {},
@@ -101,6 +102,7 @@ export default {
     };
   },
   mounted() {
+    this.userid = localStorage.getItem("smUserId");
     this.options = {
       name: this.$route.query.lname + "路",
       lname: this.$route.query.lname,
@@ -231,6 +233,17 @@ export default {
     closeTotastMaskShow() {
       this.totastMaskShow = false;
       this.totastContent = "";
+      this.sendMessage();
+    },
+    sendMessage() {
+      var obj = {
+        title: "公交通知",
+        text: "消息测试",
+        toUserId: this.userid
+      };
+      apis.sendMsg2(obj, function(res) {
+        console.log(res);
+      });
     }
   },
   components: {

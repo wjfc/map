@@ -62,7 +62,6 @@ export default {
   },
   created() {},
   mounted() {
-    console.log(window.location.href);
     this.code = window.location.search.substr(1).split("=")[1];
     var smcode = localStorage.getItem("smcode");
     if (this.code && this.code !== smcode) {
@@ -281,8 +280,21 @@ export default {
         grant_type: "authorization_code",
         redirect_uri: baseConstant.redirect_uri
       };
-      apis.getSmToken(params, function(res) {
-        console.log(res);
+      apis.getSmToken2(params, function(res) {
+        if (res.access_token) {
+          var params2 = {
+            token: res.access_token
+          };
+          apis.getSmUserid2(params2, function(res2) {
+            if (res2.userId) {
+              localStorage.setItem("smUserId", res2.userId);
+            } else {
+              console.log("获取userId失败");
+            }
+          });
+        } else {
+          console.log("获取token失败");
+        }
       });
     }
   },
