@@ -126,57 +126,7 @@ var ggjt_info = function(id, callback) {
       callback(error);
     });
 };
-// 获取数梦code接口
-// http://112.25.130.117:10067/uaa/authorize?client_id=bigapp&response_type=code&scope=openid&redirect_uri=https://gjcx.smartwj.net:8999/dist/index.html
-var getSmCode = function(callback) {
-  // var url =
-  //   "/uaa/authorize?client_id=bigapp&response_type=code&scope=openId&redirect_uri=https://gjcx.smartwj.net:8999/dist/index.html";
-  var url =
-    "/uaa/authorize?client_id=bigapp&response_type=code&scope=openId&redirect_uri=https://gjcx.smartwj.net:8999/dist/index.html&refresh_token=BC_-KW21RqcFkmRzMkwD6J7P5zM8UI1IAW1vYmlsZQ";
-  instance
-    .get(url)
-    .then(function(res) {
-      callback(res);
-    })
-    .catch(function(error) {
-      callback(error);
-    });
-};
 
-var getSmToken = function(params, callback) {
-  // 获取签名和认证
-  var queryString = "";
-  for (var k in params) {
-    queryString += k + "=" + params[k] + "&";
-  }
-  queryString = queryString.substr(0, queryString.length - 1);
-  var dateString = hmacSha256.getFilterTime();
-  var singnString = hmacSha256.hmacSha256(queryString, dateString, "POST");
-  var url = "/service/api/66bfc0f090ad41e497d1f28aa6ef3318/oauth2/token";
-  var Auth =
-    "Digest Algorithm=HMAC-SHA256,AccessKeyId=" +
-    baseConstant.smAppid +
-    ",TimeStamp=" +
-    dateString +
-    ",Signature=" +
-    singnString +
-    "";
-
-  instance
-    .post(url, queryString, {
-      headers: {
-        Authorization: Auth
-      }
-    })
-    .then(function(res) {
-      callback(res);
-    })
-    .catch(function(error) {
-      var obj = error;
-      obj.failure = true;
-      callback(obj);
-    });
-};
 var getSmToken2 = function(params, callback) {
   // 获取签名和认证
   var queryString = "";
@@ -185,7 +135,12 @@ var getSmToken2 = function(params, callback) {
   }
   queryString = queryString.substr(0, queryString.length - 1);
   var dateString = hmacSha256.getFilterTime();
-  var singnString = hmacSha256.hmacSha256(queryString, dateString, "POST");
+  var singnString = hmacSha256.hmacSha256(
+    queryString,
+    dateString,
+    "POST",
+    baseConstant.smAppSecret
+  );
   var url = "/service/api/66bfc0f090ad41e497d1f28aa6ef3318/oauth2/token";
   var Auth =
     "Digest Algorithm=HMAC-SHA256,AccessKeyId=" +
@@ -210,20 +165,7 @@ var getSmToken2 = function(params, callback) {
     }
   });
 };
-var getSmUserid = function(params, callback) {
-  var url =
-    "https://dtopen.smartwj.net:6002/service/api/66bfc0f090ad41e497d1f28aa6ef3318/oauth2/token";
-  instance
-    .get(url, {
-      params: params
-    })
-    .then(function(res) {
-      callback(res);
-    })
-    .catch(function(error) {
-      callback(error);
-    });
-};
+
 var getSmUserid2 = function(params, callback) {
   var queryString = "";
   for (var k in params) {
@@ -231,7 +173,12 @@ var getSmUserid2 = function(params, callback) {
   }
   queryString = queryString.substr(0, queryString.length - 1);
   var dateString = hmacSha256.getFilterTime();
-  var singnString = hmacSha256.hmacSha256(queryString, dateString, "GET");
+  var singnString = hmacSha256.hmacSha256(
+    queryString,
+    dateString,
+    "GET",
+    baseConstant.smAppSecret
+  );
   var url =
     "/service/api/ecd5b7a70e6c49bc93cbd28d843b0983/openApi/user/getDetailedNormalUser";
   var Auth =
@@ -245,7 +192,7 @@ var getSmUserid2 = function(params, callback) {
   $.ajax({
     url: url + "?" + queryString,
     type: "get",
-    dataType: "json",
+    dataType: "text",
     headers: {
       Authorization: Auth
     },
@@ -262,22 +209,34 @@ var sendMsg2 = function(obj, callback) {
   var timeStamp = new Date().getTime();
   var params = {
     appId: baseConstant.mesAppid,
-    toUserId: obj.toUserId,
     messageType: "text",
-    title: obj.title,
     text: obj.text,
-    timeStamp: timeStamp
+    title: obj.title,
+    toUserId: obj.toUserId
+    // pushChannel: 1
   };
   var queryString = "";
   for (var k in params) {
     queryString += k + "=" + params[k] + "&";
   }
   queryString = queryString.substr(0, queryString.length - 1);
-  var singnString = hmacSha256.hmacSha256(queryString, timeStamp, "POST");
-  queryString += "&sign=" + singnString;
+  var singnString = hmacSha256.hmacSha256_send(
+    queryString,
+    timeStamp,
+    "POST",
+    baseConstant.mesAppSecret
+  );
+
+  queryString += "&sign=" + singnString + "&timeStamp=" + timeStamp;
+  params.sign = singnString;
+  params.timeStamp = timeStamp;
+  // 当contentType设置为application/json;charset=UTF-8时，需要将参数转换为标准的json字符串形式
   $.ajax({
-    url: url + "?" + queryString,
+    url: url,
+    data: JSON.stringify(params),
+    dataType: "json",
     type: "post",
+    contentType: "application/json;charset=UTF-8",
     success: function(res) {
       callback(res);
     },
@@ -301,10 +260,7 @@ export default {
   findBusInfo: findBusInfo,
   ggjt_list: ggjt_list,
   ggjt_info: ggjt_info,
-  getSmCode: getSmCode,
-  getSmToken: getSmToken,
   getSmToken2: getSmToken2,
-  getSmUserid: getSmUserid,
   getSmUserid2: getSmUserid2,
   sendMsg2: sendMsg2
 };

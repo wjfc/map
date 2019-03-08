@@ -286,8 +286,9 @@ export default {
             token: res.access_token
           };
           apis.getSmUserid2(params2, function(res2) {
-            if (res2.userId) {
-              localStorage.setItem("smUserId", res2.userId);
+            var res_temp = utils.getCorrectNum(res2);
+            if (res_temp.userId) {
+              localStorage.setItem("smUserId", res_temp.userId);
             } else {
               console.log("获取userId失败");
             }

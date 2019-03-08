@@ -1,10 +1,18 @@
 import CryptoJS from "crypto-js";
 import baseContent from "../constant/index";
-var hmacSha256 = function(queryString, timeStemap, method) {
+var hmacSha256 = function(queryString, timeStemap, method, secret) {
   var signStr = method + "&" + encodeURIComponent("/") + "&";
   var TimeStamp = encodeURIComponent(timeStemap).replace("%20", "+") + "&";
   signStr += TimeStamp + encodeURIComponent(queryString);
-  var _t = CryptoJS.HmacSHA256(signStr, baseContent.smAppSecret);
+  var _t = CryptoJS.HmacSHA256(signStr, secret);
+  var hashInBase64 = CryptoJS.enc.Base64.stringify(_t);
+  return hashInBase64;
+};
+var hmacSha256_send = function(queryString, timeStemap, method, secret) {
+  var queryString = queryString.replace(/%(?![0-9a-fA-F]{2})/gi, "%25");
+  var signStr = method + "&" + encodeURIComponent("/") + "&";
+  signStr += timeStemap + "&" + encodeURIComponent(queryString);
+  var _t = CryptoJS.HmacSHA256(signStr, secret);
   var hashInBase64 = CryptoJS.enc.Base64.stringify(_t);
   return hashInBase64;
 };
@@ -33,5 +41,6 @@ var getFilterTime = function() {
 };
 export default {
   hmacSha256: hmacSha256,
+  hmacSha256_send: hmacSha256_send,
   getFilterTime: getFilterTime
 };

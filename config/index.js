@@ -38,6 +38,10 @@ module.exports = {
       "/service": {
         target: "https://dtopen.smartwj.net:6002",
         changeOrigin: true //是否跨域
+      },
+      "/Message": {
+        target: "http://112.25.130.117:10040",
+        changeOrigin: true //是否跨域
       }
     },
     // https://webpack.js.org/configuration/devtool/#development

@@ -48,7 +48,7 @@
         <li
           v-for="(v,i) in stationList"
           :key="i"
-          :class="{hasBusIcon:v.busIcon}"
+          :class="{hasBusIcon:v.busIcon,active:statinonIndex === i}"
           @click="stationFocus(v,i)"
         >
           <p :class="{active:statinonIndex === i}">{{v.sname}}</p>
@@ -158,11 +158,10 @@ export default {
       if (this.findBusInfo_timer) {
         clearInterval(this.findBusInfo_timer);
         this.findBusInfo_timer = null;
-      } else {
-        this.findBusInfo_timer = setInterval(() => {
-          self.findBusInfo();
-        }, 60000);
       }
+      this.findBusInfo_timer = setInterval(() => {
+        self.findBusInfo();
+      }, 30000);
     },
     //
     // 跳转到公交线路地图详情页面
@@ -232,13 +231,12 @@ export default {
     },
     closeTotastMaskShow() {
       this.totastMaskShow = false;
-      this.totastContent = "";
       this.sendMessage();
     },
     sendMessage() {
       var obj = {
         title: "公交通知",
-        text: "消息测试",
+        text: this.totastContent,
         toUserId: this.userid
       };
       apis.sendMsg2(obj, function(res) {
@@ -367,12 +365,25 @@ export default {
 
 .buslines-content li.hasBusIcon::before {
   position: absolute;
+  left: -33px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 66px;
+  height: 66px;
+  background: url("../../static/images/busIcon.png") no-repeat;
+  background-size: 100% 100%;
+  border: 0px solid rgba(15, 200, 153, 1) !important;
+  content: "";
+  z-index: 999;
+}
+.buslines-content li.active::before {
+  position: absolute;
   left: -22px;
   top: 50%;
   transform: translateY(-50%);
   width: 44px;
   height: 44px;
-  background: url("../../static/images/busIcon.png") no-repeat;
+  background: url("../../static/images/locationIcon.png") no-repeat;
   background-size: 100% 100%;
   border: 0px solid rgba(15, 200, 153, 1) !important;
   content: "";
