@@ -210,23 +210,23 @@ var sendMsg2 = function(obj, callback) {
   var params = {
     appId: baseConstant.mesAppid,
     messageType: "text",
+    pushChannel: 2,
     text: obj.text,
     title: obj.title,
     toUserId: obj.toUserId
-    // pushChannel: 1
   };
   var queryString = "";
   for (var k in params) {
     queryString += k + "=" + params[k] + "&";
   }
   queryString = queryString.substr(0, queryString.length - 1);
+
   var singnString = hmacSha256.hmacSha256_send(
     queryString,
     timeStamp,
     "POST",
     baseConstant.mesAppSecret
   );
-
   queryString += "&sign=" + singnString + "&timeStamp=" + timeStamp;
   params.sign = singnString;
   params.timeStamp = timeStamp;

@@ -36,6 +36,9 @@
               <div class="mapPreview" @click="goBusLineMapPreview(0)">
                 <mapPreview></mapPreview>
               </div>
+              <div class="yubao" @click="sendMessage">
+                <img src="../../static/images/yubao.png" alt>
+              </div>
             </div>
           </swiper-slide>
           <!-- Optional controls -->
@@ -83,6 +86,7 @@ export default {
       code: "",
       options: {},
       activeIndex: 0,
+      yubaoTimer: null,
       swiperOption: {
         // some swiper options/callbacks
         // 所有的参数同 swiper 官方 api 参数
@@ -103,6 +107,7 @@ export default {
   },
   mounted() {
     this.userid = localStorage.getItem("smUserId");
+
     this.options = {
       name: this.$route.query.lname + "路",
       lname: this.$route.query.lname,
@@ -175,6 +180,7 @@ export default {
         }
       });
     },
+    // 获取线路公交详情
     findBusInfo() {
       var self = this;
       var busLastSlon = [];
@@ -199,8 +205,10 @@ export default {
       this.activeIndex = this.swiper.activeIndex;
       this.getStationList();
     },
+    // 点击站台获得焦点状态
     stationFocus(v, i) {
       this.statinonIndex = i;
+
       var slno = v.slno;
       var lastArr = [];
       this.busLastSlon.forEach((v, i) => {
@@ -213,9 +221,9 @@ export default {
       } else {
         this.showMessageNum = null;
       }
-
       this.showTotast();
     },
+    // 展示模态框
     showTotast() {
       // console.log(this.showMessageNum);
       if (this.showMessageNum > 0) {
@@ -231,17 +239,65 @@ export default {
     },
     closeTotastMaskShow() {
       this.totastMaskShow = false;
-      this.sendMessage();
     },
     sendMessage() {
-      var obj = {
-        title: "公交通知",
-        text: this.totastContent,
-        toUserId: this.userid
-      };
-      apis.sendMsg2(obj, function(res) {
-        console.log(res);
-      });
+      if (!this.statinonIndex) {
+        this.totastContent = "请先选择一个车站添加到报站工作台！";
+        this.totastMaskShow = true;
+      } else {
+        // 添加定时器预报
+        var slno = this.stationList[this.statinonIndex].slno;
+        var self = this;
+        if (this.yubaoTimer) {
+          clearInterval(this.yubaoTimer);
+          this.yubaoTimer = null;
+        } else {
+          this.yubaoTimer = setInterval(function() {
+            var lastArr = [];
+            self.busLastSlon.forEach((v, i) => {
+              if (v <= slno) {
+                lastArr.push(slno - v);
+              }
+            });
+            if (lastArr.length > 0) {
+              var yubaoNum = Math.min.apply(null, lastArr);
+              if (yubaoNum > 0 && yubaoNum <= 2) {
+                var obj = {
+                  title: "公交通知",
+                  text: "公交即将到站，请尽快赶到车站乘车！",
+                  toUserId: this.userid || "406451624106001384"
+                };
+                apis.sendMsg2(obj, function(res) {
+                  self.totastContent = "添加报站成功，请注意查询！";
+                  self.totastMaskShow = true;
+                  clearInterval(self.yubaoTimer);
+                  self.yubaoTimer = null;
+                });
+              } else if (yubaoNum == 0) {
+                var obj = {
+                  title: "公交通知",
+                  text: "公交已经到站了，请注意抓紧时间乘车！",
+                  toUserId: this.userid || "406451624106001384"
+                };
+                apis.sendMsg2(obj, function(res) {
+                  self.totastContent = "添加报站成功，请注意查询！";
+                  self.totastMaskShow = true;
+                  clearInterval(self.yubaoTimer);
+                  self.yubaoTimer = null;
+                });
+              }
+            }
+          }, 1000);
+        }
+      }
+      // var obj = {
+      //   title: "公交通知",
+      //   text: this.totastContent,
+      //   toUserId: this.userid || "406451624106001384"
+      // };
+      // apis.sendMsg2(obj, function(res) {
+      //   console.log(res);
+      // });
     }
   },
   components: {
@@ -288,11 +344,22 @@ export default {
 }
 .mapPreview {
   position: absolute;
-  top: 84px;
+  top: 49px;
   /* right: 8px; */
   left: 485px;
   width: 190px;
   height: 107px;
+}
+.yubao {
+  position: absolute;
+  left: 485px;
+  top: 131px;
+  width: 190px;
+  height: 107px;
+}
+.yubao img {
+  width: 100%;
+  height: 100%;
 }
 .list-item {
   max-width: 500px;
@@ -370,7 +437,7 @@ export default {
   transform: translateY(-50%);
   width: 66px;
   height: 66px;
-  background: url("../../static/images/busIcon.png") no-repeat;
+  background: url("../../static/images/busIconNew.png") no-repeat;
   background-size: 100% 100%;
   border: 0px solid rgba(15, 200, 153, 1) !important;
   content: "";
