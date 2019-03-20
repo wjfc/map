@@ -36,7 +36,7 @@
               <div class="mapPreview" @click="goBusLineMapPreview(0)">
                 <mapPreview></mapPreview>
               </div>
-              <div class="yubao" @click="sendMessage">
+              <div class="yubao" @click="callAlarme">
                 <img src="../../static/images/yubao.png" alt>
               </div>
             </div>
@@ -221,7 +221,7 @@ export default {
       } else {
         this.showMessageNum = null;
       }
-      this.showTotast();
+      // this.showTotast();
     },
     // 展示模态框
     showTotast() {
@@ -290,14 +290,43 @@ export default {
           }, 1000);
         }
       }
-      // var obj = {
-      //   title: "公交通知",
-      //   text: this.totastContent,
-      //   toUserId: this.userid || "406451624106001384"
-      // };
-      // apis.sendMsg2(obj, function(res) {
-      //   console.log(res);
-      // });
+    },
+    callAlarme() {
+      // ?lguid=0000000000LINELINEINFO16092021904440&destIndex=21&forecastNumber=2&userId=406451624106001384
+      if (!this.statinonIndex) {
+        this.totastContent = "请先选择一个车站添加到报站工作台！";
+        this.totastMaskShow = true;
+      } else {
+        var slno = this.stationList[this.statinonIndex].slno;
+        var lguid = this.stationList[this.statinonIndex].lguid;
+        var self = this;
+        var lastArr = [];
+        self.busLastSlon.forEach((v, i) => {
+          if (v <= slno) {
+            lastArr.push(slno - v);
+          }
+        });
+        if (lastArr.length > 0) {
+          var yubaoNum = Math.min.apply(null, lastArr);
+          if (yubaoNum > 0 && yubaoNum <= 1) {
+            self.totastContent = "车辆即将到达本站！";
+            self.totastMaskShow = true;
+          } else {
+            var params = {
+              lguid: lguid,
+              destIndex: slno,
+              forecastNumber: 2,
+              userId: this.userid
+            };
+            apis.callBusWarn(params, function(res) {
+              if (res.data.message == "success") {
+                self.totastContent = "设置成功！";
+                self.totastMaskShow = true;
+              }
+            });
+          }
+        }
+      }
     }
   },
   components: {

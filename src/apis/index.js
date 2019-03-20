@@ -246,6 +246,19 @@ var sendMsg2 = function(obj, callback) {
   });
 };
 
+var callBusWarn = function(params, callback) {
+  var url = "/fgw/interfaces/bus/callBusWarn";
+  instance
+    .get(url, {
+      params: params
+    })
+    .then(function(res) {
+      callback(res);
+    })
+    .catch(function(error) {
+      callback(error);
+    });
+};
 // http://localhost:8080/wjtran/busInfo/find?lguids=0000000000LINELINEINFO15121021854704
 // http://localhost:8080/wjtran/channelStation/find?lguids=0000000000LINELINEINFO15121021854704
 // D:\myStudy\vue\map-gd\wj-gj\dist.zip
@@ -262,5 +275,6 @@ export default {
   ggjt_info: ggjt_info,
   getSmToken2: getSmToken2,
   getSmUserid2: getSmUserid2,
-  sendMsg2: sendMsg2
+  sendMsg2: sendMsg2,
+  callBusWarn: callBusWarn
 };
