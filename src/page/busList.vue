@@ -6,6 +6,10 @@
         <p>{{options.name}}</p>
         <img src="../../static/images/home2.png" alt @click="home()">
       </div>
+      <div class="searchRoutes">
+        <div class="startInput inputBox"></div>
+        <div class="endInput inputBox"></div>
+      </div>
       <ul class="strategy">
         <li
           :class="{'focus':i===typeIndex}"
@@ -58,7 +62,8 @@ export default {
   },
   mounted() {
     this.options = {
-      name: decodeURI(this.$route.query.name),
+      // name: decodeURI(this.$route.query.name),
+      name: "线路推荐",
       address: decodeURI(this.$route.query.address),
       location: this.$route.query.location,
       id: this.$route.query.id
@@ -77,8 +82,8 @@ export default {
         var origin = this.$store.state.location_now;
       }
       var params = {
-        origin: origin, //当前位置定位
-        destination: this.options.location, //目的地位置定位
+        origin: origin, //起点位置定位
+        destination: this.options.location, //终点位置定位
         key: baseConstant.key,
         city: baseConstant.adname,
         strategy: this.strategy[i].type
@@ -202,10 +207,29 @@ export default {
   color: #fff;
   background-color: #37cabe;
 }
+/* 输入起点终点 */
+.searchRoutes {
+  width: 100%;
+  height: 170px;
+  padding-top: 21px;
+  padding-left: 16px;
+  padding-right: 16px;
+  box-sizing: border-box;
+  background: pink;
+}
+.searchRoutes .inputBox {
+  width: 100%;
+  height: 64px;
+  line-height: 64px;
+  background: violet;
+}
+/*  输入起点终点结束 */
+/* 路线详情 */
 .routes {
   /* margin-top: 18px; */
   position: absolute;
-  top: 176px;
+  /* top: 176px; */
+  top: 346px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -221,4 +245,5 @@ export default {
   padding: 44px 0;
   box-sizing: border-box;
 }
+/* 路线详情结束 */
 </style>
