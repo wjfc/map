@@ -61,7 +61,7 @@ export default {
         key: baseConstant.key,
         city: baseConstant.adname
       };
-
+      console.log(params);
       apis.getRoutesInfo(params, function(res) {
         if (res.data.route.transits.length > 0) {
           self.$router.push({

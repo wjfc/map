@@ -177,25 +177,26 @@ export default {
   margin-top: 14px;
   width: 720px;
   height: 58px;
-  border: 1px solid rgba(55, 202, 190, 1);
-  border-radius: 10px;
   box-sizing: border-box;
 }
 .strategy li {
-  flex: 1;
+  width: 25%;
   text-align: center;
   line-height: 58px;
   font-size: 28px;
   color: #37cabe;
-  border-right: 1px solid #37cabe;
+  /* border-right: 2px solid #37cabe; */
+  border: 2px solid #37cabe;
+  border-right: 0px solid #37cabe;
   box-sizing: border-box;
 }
 .strategy li:first-child {
   border-radius: 10px 0 0 10px;
 }
 .strategy li:last-child {
-  border: none;
+  /* border: none; */
   border-radius: 0 10px 10px 0;
+  border-right: 2px solid #37cabe;
 }
 .strategy li.focus {
   color: #fff;

@@ -36,6 +36,10 @@
       </div>
     </div>
     <!-- 历史记录列表结束 -->
+    <div class="noSearchList" v-show="nosearch" @click="hideNosearch">
+      <img src="../../static/images/nosearch.png" alt>
+      <p>取消</p>
+    </div>
   </div>
 </template>
 
@@ -70,7 +74,6 @@ export default {
       //表单提交
       this.nosearch = false;
       var self = this;
-
       /**
        * 1、需要做判断，如果输入的是汉字，调用高德的模糊搜索接口。
        * 2、如果输入的是数字，则调用吴江公交的接口。
@@ -95,6 +98,7 @@ export default {
           var records = res.data.records;
           records.forEach((v, i) => {
             v.name = v.lname + "路" + "(" + v.ldirection + ")";
+            // 定义特殊id值wjgj，表明是吴江的公交线路
             v.id = "wjgj";
             historyList.push(v);
           });
@@ -120,7 +124,8 @@ export default {
           var historyList = [];
           var tips = res.data.tips;
           tips.forEach((v, i) => {
-            if (v.adcode == "320509" && v.location.length > 0) {
+            // v.adcode == "320509" &&
+            if (v.location.length > 0) {
               historyList.push(v);
             }
           });
@@ -137,6 +142,7 @@ export default {
     // 输入框获得焦点逻辑
     inputFocus() {
       this.showList = true;
+
       if (this.searchContent == "") {
         // 输入框为空时，查询历史记录展示
         this.historyList = this.searchStorage;
@@ -197,6 +203,11 @@ export default {
       // 当展示的是历史记录时，点击取消则是隐藏
       this.showList = false;
     },
+    // 隐藏暂无搜索结果
+    hideNosearch() {
+      this.nosearch = false;
+      this.searchContent = "";
+    },
     // 数组去重
     uniqueList(v, arr) {
       var index = -1;
@@ -208,7 +219,15 @@ export default {
       return index;
     }
   },
-  watch: {}
+  watch: {
+    historyList(newVal, oldVal) {
+      if (newVal.length < 1 && this.searchContent !== "") {
+        this.nosearch = true;
+      } else {
+        this.nosearch = false;
+      }
+    }
+  }
 };
 </script>
 
@@ -222,10 +241,11 @@ export default {
   background: #37cabe;
   box-sizing: border-box;
 }
+/* 暂无搜索记录 */
 .noSearchList {
   position: absolute;
   width: 100%;
-  height: 1256px;
+  height: 562px;
   top: 88px;
   bottom: 0;
   background: #fff;
@@ -233,11 +253,21 @@ export default {
 }
 .noSearchList img {
   position: absolute;
-  top: 288px;
   left: 50%;
+  top: 101px;
   transform: translate(-50%);
   width: 280px;
   height: 280px;
+}
+.noSearchList p {
+  position: absolute;
+  bottom: 0px;
+  font-size: 30px;
+  height: 80px;
+  line-height: 80px;
+  width: 100%;
+  text-align: center;
+  border-top: 1px solid #f5f5f5;
 }
 .searchHeader .btn {
   position: absolute;
@@ -251,6 +281,8 @@ export default {
   color: #fff;
   background-color: transparent;
 }
+/* 暂无搜索记录结束 */
+
 /* 设置padding-left 给搜索icon预留位置 */
 .searchBox {
   display: flex;

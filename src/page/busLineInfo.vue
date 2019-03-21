@@ -93,6 +93,7 @@ export default {
         pagination: {
           el: ".swiper-pagination"
         },
+
         activeIndex: 0
       },
       busList: [], //公交车双向列表
@@ -166,7 +167,7 @@ export default {
       }
       this.findBusInfo_timer = setInterval(() => {
         self.findBusInfo();
-      }, 30000);
+      }, 10000);
     },
     //
     // 跳转到公交线路地图详情页面
@@ -355,33 +356,37 @@ export default {
 }
 /* 轮播图部分样式 */
 .buslines-header {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999999;
   width: 100%;
   height: 250px;
   background-color: #37cabe;
 }
 .buslines-swiper {
-  position: absolute;
+  position: fixed;
+  z-index: 999999;
   top: 108px;
   left: 50%;
   transform: translate(-50%);
   width: 690px;
   height: 250px;
-  background: rgba(255, 255, 255, 1);
-  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.2);
+  background: #fff;
+  box-shadow: 0px 5px 20px 0px #ccc;
   border-radius: 16px;
 }
 .mapPreview {
   position: absolute;
   top: 49px;
   /* right: 8px; */
-  left: 485px;
+  left: 480px;
   width: 190px;
   height: 107px;
 }
 .yubao {
   position: absolute;
-  left: 485px;
+  left: 480px;
   top: 131px;
   width: 190px;
   height: 107px;
@@ -392,7 +397,7 @@ export default {
 }
 .list-item {
   max-width: 500px;
-  padding-left: 32px;
+  padding-left: 40px;
   padding-top: 49px;
   box-sizing: border-box;
 }
@@ -400,7 +405,7 @@ export default {
   margin-bottom: 38px;
 }
 .direction span {
-  font-size: 36px;
+  font-size: 32px;
   color: #000;
 }
 .bustimes {

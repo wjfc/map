@@ -133,6 +133,7 @@ export default {
         pagination: {
           el: ".swiper-pagination"
         },
+
         activeIndex: 0
       },
       transits: [], //高德返回路线数组
@@ -485,7 +486,7 @@ export default {
   width: 100%;
   height: 250px;
   padding: 44px 0;
-  padding-left: 29px;
+  padding-left: 40px;
   box-sizing: border-box;
 }
 .mapPreview {
