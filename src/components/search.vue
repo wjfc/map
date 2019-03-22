@@ -142,7 +142,6 @@ export default {
     // 输入框获得焦点逻辑
     inputFocus() {
       this.showList = true;
-
       if (this.searchContent == "") {
         // 输入框为空时，查询历史记录展示
         this.historyList = this.searchStorage;

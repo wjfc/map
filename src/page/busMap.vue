@@ -1,6 +1,6 @@
 <template>
   <div class="busMap">
-    <basicHeader :desName="options.name"></basicHeader>
+    <basicHeader :desName="options.name+'-'+options.address"></basicHeader>
     <mapComponent class="mapComponent2" ref="mapObj" :dataFLag="false"></mapComponent>
     <div class="busmap-bottom">
       <ul class="line-list">
@@ -56,27 +56,22 @@ export default {
     var self = this;
     this.options = {
       name: decodeURI(this.$route.query.name),
-      address: decodeURI(this.$route.query.address),
-      location: this.$route.query.location,
-      id: this.$route.query.id,
+      address: decodeURI(this.$route.query.address), //目的地名称
+      origin: this.$route.query.origin, //起点位置定位
+      location: this.$route.query.location, //目的地定位
       type: this.$route.query.type,
       focusIndex: this.$route.query.focusIndex
     };
     this.focusIndex = Number(this.$route.query.focusIndex);
     this.destination = this.$route.query.location; //终点
+    this.origin = this.$route.query.origin;
     this.getRoutes(this.options.type);
   },
   methods: {
     getRoutes(i) {
       var self = this;
-      if (!this.$store.state.location_now) {
-        var origin = localStorage.getItem("location_now");
-      } else {
-        var origin = this.$store.state.location_now;
-      }
-      this.origin = origin;
       var params = {
-        origin: origin, //当前位置定位
+        origin: this.options.origin, //当前位置定位
         destination: this.options.location, //目的地位置定位
         key: baseConstant.key,
         city: baseConstant.adname,
@@ -281,8 +276,8 @@ export default {
         query: {
           name: encodeURI(this.options.name),
           address: encodeURI(this.options.address),
+          origin: this.options.origin,
           location: this.options.location,
-          id: this.options.id,
           type: this.options.type,
           focusIndex: this.focusIndex
         }

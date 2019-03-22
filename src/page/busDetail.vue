@@ -149,7 +149,7 @@ export default {
       name: decodeURI(this.$route.query.name),
       address: decodeURI(this.$route.query.address),
       location: this.$route.query.location,
-      id: this.$route.query.id,
+      origin: this.$route.query.origin,
       type: this.$route.query.type,
       focusIndex: this.$route.query.focusIndex
     };
@@ -161,14 +161,8 @@ export default {
   methods: {
     getRoutes(type) {
       var self = this;
-      if (!this.$store.state.location_now) {
-        var origin = localStorage.getItem("location_now");
-      } else {
-        var origin = this.$store.state.location_now;
-      }
-      this.origin = origin;
       var params = {
-        origin: origin, //当前位置定位
+        origin: this.options.origin, //当前位置定位
         destination: this.options.location, //目的地位置定位
         key: baseConstant.key,
         city: baseConstant.adname,

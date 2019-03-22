@@ -46,6 +46,7 @@ export default {
   data() {
     return {
       code: null,
+      showFriend_tips: true,
       dataFrom: "home",
       showChannel: false,
       stationInfo: {}, //站台信息
@@ -415,6 +416,43 @@ export default {
   display: none;
 }
 /* 通知公告样式结束 */
+
+/* 友情提示 */
+.tips-firendly {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100000;
+}
+.tips-box {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 540px;
+  height: 252px;
+  background: #fff;
+  border-radius: 20px;
+  font-size: 30px;
+}
+.tips-box p:nth-child(1) {
+  width: 100%;
+  text-align: center;
+  line-height: 164px;
+  height: 164px;
+  border-bottom: 1px solid #dddddd;
+}
+.tips-box p:nth-child(2) {
+  width: 100%;
+  text-align: center;
+  line-height: 87px;
+  height: 87px;
+}
+/* 友情提示结束 */
+
 .mapComponent {
   position: absolute;
   top: 88px;
