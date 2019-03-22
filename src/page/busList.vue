@@ -302,13 +302,9 @@ export default {
           // 需要保存位置信息
           // var posX = data.position.getLng();
           // var poxY = data.position.getLat();
-          // self.$store.commit("changeNowLocation", posX + "," + poxY);
-          // self.changeNowLocation(posX + "," + poxY);
+          // self.currentLocation = posX + "," + poxY;
           self.currentLocation = "120.638966" + "," + "31.151753";
-          // self.origin = {
-          //   location: self.currentLocation,
-          //   name: "我的位置"
-          // };
+
           if (self.searchType == 0) {
             // 起点
             self.origin = {

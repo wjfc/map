@@ -477,7 +477,7 @@ export default {
 
 .listbox {
   position: relative;
-  width: 100%;
+  width: 74%;
   height: 250px;
   padding: 44px 0;
   padding-left: 40px;
