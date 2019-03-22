@@ -65,7 +65,7 @@
       </div>
     </div>
     <!-- 提示起点和终点一样 -->
-    <div class="sameDirection" v-show="showSameDirection">起点和终点不能相同</div>
+    <div class="sameDirection" v-show="showSameDirection">{{showSameText}}</div>
   </div>
 </template>
 
@@ -83,6 +83,7 @@ export default {
       showLoading: false,
       loadingText: "重新获取定位中...",
       showSameDirection: false,
+      showSameText: "起点和终点不能相同",
       showSameDirectionTimer: null,
       options: {},
       typeIndex: 0,
@@ -163,6 +164,7 @@ export default {
       this.showLoading = true;
       this.loadingText = "正在努力加载中...";
       this.showSearchResult = false;
+
       var params = {
         origin: this.origin.location, //起点位置定位
         destination: this.destination.location, //终点位置定位
@@ -322,9 +324,11 @@ export default {
             self.searchStart = self.destination.name;
           }
           self.showLoading = false;
-          self.showSearchResult = false;
           // 调用路线规划
-          self.getRoutes(self.typeIndex);
+          if (this.searchEnd == "" && this.searchStart == "") {
+            self.getRoutes(self.typeIndex);
+            self.showSearchResult = false;
+          }
         }
         function onError(data) {
           console.log(data);
@@ -348,6 +352,7 @@ export default {
     dealSameDirection() {
       // 方向一致时，展示方向不能一致。
       var self = this;
+      this.showSameText = "起点和终点不能相同";
       this.showSameDirection = true;
 
       if (this.showSameDirectionTimer) {
@@ -561,7 +566,6 @@ export default {
 }
 .searchRoutes .inputBox {
   position: relative;
-  width: 100%;
   height: 64px;
   line-height: 64px;
   background: #fcfcfc;
@@ -569,8 +573,8 @@ export default {
 
 .searchRoutes .inputBox input {
   display: block;
-  padding-left: 76px;
-  width: 100%;
+  margin-left: 76px;
+  width: 540px;
   height: 100%;
   font-size: 28px;
   border: 0;
@@ -579,13 +583,13 @@ export default {
   box-sizing: border-box;
 }
 
-.searchRoutes .inputBox:last-child::before {
+.searchRoutes .inputBox:nth-child(2)::before {
   content: "";
   position: absolute;
   left: 76px;
   top: 0;
-  width: 643px;
-  height: 1px;
+  width: 540px;
+  height: 2px;
   background: #ccc;
   z-index: 999;
 }
