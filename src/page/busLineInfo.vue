@@ -396,6 +396,8 @@ export default {
   height: 100%;
 }
 .list-item {
+  position: relative;
+  z-index: 9999;
   max-width: 500px;
   padding-left: 40px;
   padding-top: 49px;

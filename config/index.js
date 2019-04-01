@@ -27,8 +27,9 @@ module.exports = {
         target: "https://restapi.amap.com/", // 接口域名
         changeOrigin: true //是否跨域
       },
+      // 公交接口
       "/wjtran": {
-        target: "https://gjcx.smartwj.net:8999",
+        target: "https://app.smartwj.net:10031",
         changeOrigin: true //是否跨域
       },
       "/ggjt": {

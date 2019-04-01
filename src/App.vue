@@ -1,13 +1,6 @@
 <template>
   <div id="app">
     <router-view/>
-    <!-- 友情提示 -->
-    <div class="tips-firendly" v-show="showFriend_tips">
-      <div class="tips-box">
-        <p>该地图线路仅供参考</p>
-        <p @click="closeFriend_tips">关闭</p>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -15,19 +8,10 @@
 export default {
   name: "App",
   data() {
-    return { showFriend_tips: true };
+    return {};
   },
-  mounted() {
-    var self = this;
-    setTimeout(function() {
-      self.showFriend_tips = false;
-    }, 3000);
-  },
-  methods: {
-    closeFriend_tips() {
-      this.showFriend_tips = false;
-    }
-  }
+  mounted() {},
+  methods: {}
 };
 </script>
 

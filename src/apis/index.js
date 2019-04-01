@@ -141,7 +141,7 @@ var getSmToken2 = function(params, callback) {
     "POST",
     baseConstant.smAppSecret
   );
-  var url = "/service/api/66bfc0f090ad41e497d1f28aa6ef3318/oauth2/token";
+  var url = "/service/api/b6c30553454d4b719c3248f58d49ef5b/oauth2/token";
   var Auth =
     "Digest Algorithm=HMAC-SHA256,AccessKeyId=" +
     baseConstant.smAppid +
@@ -180,7 +180,7 @@ var getSmUserid2 = function(params, callback) {
     baseConstant.smAppSecret
   );
   var url =
-    "/service/api/ecd5b7a70e6c49bc93cbd28d843b0983/openApi/user/getDetailedNormalUser";
+    "/service/api/e4068dda62504ce4a518bcf8b955723e/openApi/user/getDetailedNormalUser";
   var Auth =
     "Digest Algorithm=HMAC-SHA256,AccessKeyId=" +
     baseConstant.smAppid +
@@ -263,6 +263,8 @@ var callBusWarn = function(params, callback) {
 // http://localhost:8080/wjtran/channelStation/find?lguids=0000000000LINELINEINFO15121021854704
 // D:\myStudy\vue\map-gd\wj-gj\dist.zip
 // https://gjcx.smartwj.net:8999/fgw/interfaces/dtopen/personal/getBriefUser?code=
+// https://user.smartwj.net:10006/uaa/authorize?client_id=a2c2c57f79df47d7addfae4c1ae090be&response_type=code&scope=openId&redirect_uri=https://app.smartwj.net:10030/dist/index.html
+//  https://user.smartwj.net:10006/uaa/authorize?client_id=a2c2c57f79df47d7addfae4c1ae090be&response_type=code&scope=openId&redirect_uri=https://gjcx.smartwj.net:8999/dist/index.html
 export default {
   getRoutesInfo: getRoutesInfo,
   getWalkingInfo: getWalkingInfo,

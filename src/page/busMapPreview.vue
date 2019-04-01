@@ -63,6 +63,7 @@ export default {
       name: decodeURI(this.$route.query.name),
       address: decodeURI(this.$route.query.address),
       location: this.$route.query.location,
+      origin: this.$route.query.origin,
       id: this.$route.query.id,
       type: this.$route.query.type,
       activeIndex: this.$route.query.activeIndex, //方案
@@ -75,14 +76,8 @@ export default {
   methods: {
     getRoutes(i) {
       var self = this;
-      if (!this.$store.state.location_now) {
-        var origin = localStorage.getItem("location_now");
-      } else {
-        var origin = this.$store.state.location_now;
-      }
-      this.origin = origin;
       var params = {
-        origin: origin, //当前位置定位
+        origin: this.options.origin, //当前位置定位
         destination: this.options.location, //目的地位置定位
         key: baseConstant.key,
         city: baseConstant.adname,
@@ -254,7 +249,7 @@ export default {
       var steps = [];
       // 开始出发
       steps.push({
-        desc: "从我的位置出发",
+        desc: this.options.name,
         distance: ""
       });
       if (self.options.point == "start") {
@@ -305,7 +300,7 @@ export default {
       });
       // 终点
       steps.push({
-        desc: "到达" + this.options.name,
+        desc: "到达" + this.options.address,
         distance: ""
       });
       if (self.options.point == "end") {

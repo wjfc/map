@@ -30,6 +30,13 @@
         @click="goNotice(newestMessage.id)"
       >{{newestMessage.title}}</div>
     </div>
+    <!-- 友情提示 -->
+    <div class="tips-firendly" v-show="showFriend_tips">
+      <div class="tips-box">
+        <p>该地图线路仅供参考</p>
+        <p @click="closeFriend_tips">关闭</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -49,6 +56,7 @@ export default {
       showFriend_tips: true,
       dataFrom: "home",
       showChannel: false,
+      showFriend_tips: true,
       stationInfo: {}, //站台信息
       stationMark: [], //获取到的点标记数据
       stationIcon: [], //高德描点图标数组
@@ -70,7 +78,9 @@ export default {
     } else {
       this.code = smcode;
     }
-
+    setTimeout(function() {
+      self.showFriend_tips = false;
+    }, 3000);
     this.getUserid();
     this.ggjt_list();
   },
@@ -298,6 +308,9 @@ export default {
           console.log("获取token失败");
         }
       });
+    },
+    closeFriend_tips() {
+      this.showFriend_tips = false;
     }
   },
   components: {

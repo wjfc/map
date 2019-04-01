@@ -131,7 +131,7 @@ export default {
       }
       var markIcon = new AMap.Icon({
         // 图标的取图地址
-        image: "./static/images/location.png",
+        image: "./static/images/location2.png",
         // 图标尺寸
         size: new AMap.Size(48, 48)
         // 选用的图片尺寸

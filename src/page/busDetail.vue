@@ -104,7 +104,7 @@
         v-show="transits.length>0"
         @click="goBusMapPreview('','end')"
       >
-        <div class="bustDetail-destance leftIcon red">{{options.name}}</div>
+        <div class="bustDetail-destance leftIcon red">{{options.address}}</div>
       </div>
     </div>
   </div>
@@ -154,7 +154,6 @@ export default {
       focusIndex: this.$route.query.focusIndex
     };
     this.destination = this.$route.query.location; //终点
-
     this.activeIndex = this.options.focusIndex;
     this.getRoutes(this.options.type);
   },
@@ -162,7 +161,7 @@ export default {
     getRoutes(type) {
       var self = this;
       var params = {
-        origin: this.options.origin, //当前位置定位
+        origin: this.options.origin, //开始位置定位
         destination: this.options.location, //目的地位置定位
         key: baseConstant.key,
         city: baseConstant.adname,
@@ -302,7 +301,7 @@ export default {
       };
       apis.matchChannel(params, function(res) {
         if (res.data.code == 0) {
-          console.log(res.data.record.station);
+          // console.log(res.data.record.station);
         }
       });
     },
@@ -341,7 +340,7 @@ export default {
        * 2、到最后一步的时候，再画终点。
        */
       if (i == 0) {
-        return "我的位置";
+        return this.options.name;
       } else if (i > 0) {
         return null;
       }
@@ -381,6 +380,7 @@ export default {
           name: encodeURI(this.options.name),
           address: encodeURI(this.options.address),
           location: this.options.location,
+          origin: this.options.origin,
           id: this.options.id,
           type: this.options.type,
           activeIndex: this.activeIndex,

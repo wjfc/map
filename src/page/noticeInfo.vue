@@ -1,8 +1,10 @@
 <template>
   <div class="noticeInfo">
     <basicHeader :desName="msg"></basicHeader>
-    <div class="info">
-      <img :src="imgUrl[i]" alt v-for="(v,i) in imgUrl" :key="i">
+    <div class="info" v-if="hackReset">
+      <div v-for="(v,i) in imgUrl" :key="i">
+        <img :src="imgUrl[i]" alt class="itemimg">
+      </div>
     </div>
   </div>
 </template>
@@ -16,7 +18,8 @@ export default {
     return {
       msg: "通知详情",
       id: null,
-      imgUrl: null
+      hackReset: true,
+      imgUrl: []
     };
   },
   mounted() {
@@ -27,9 +30,14 @@ export default {
   methods: {
     getInfo() {
       var self = this;
+      var result;
       apis.ggjt_info(this.id, function(res) {
         // console.log(res.data);
-        self.imgUrl = res.data.result.imgUrls;
+        result = res.data.result.imgUrls;
+        self.imgUrl = result;
+        self.$nextTick(() => {
+          self.hackReset = true;
+        });
       });
     }
   },
@@ -48,7 +56,8 @@ export default {
   left: 0;
   right: 0;
 }
-.noticeInfo .info img {
+.noticeInfo .info .itemimg {
+  display: block;
   width: 100%;
 }
 </style>

@@ -321,7 +321,7 @@ export default {
           }
           self.showLoading = false;
           // 调用路线规划
-          if (this.searchEnd == "" && this.searchStart == "") {
+          if (this.searchEnd != "" && this.searchStart != "") {
             self.getRoutes(self.typeIndex);
             self.showSearchResult = false;
           }
