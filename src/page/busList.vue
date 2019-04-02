@@ -300,10 +300,10 @@ export default {
         AMap.event.addListener(geolocation, "error", onError); //返回定位出错信息
         function onComplete(data) {
           // 需要保存位置信息
-          // var posX = data.position.getLng();
-          // var poxY = data.position.getLat();
-          // self.currentLocation = posX + "," + poxY;
-          self.currentLocation = "120.638966" + "," + "31.151753";
+          var posX = data.position.getLng();
+          var poxY = data.position.getLat();
+          self.currentLocation = posX + "," + poxY;
+          // self.currentLocation = "120.638966" + "," + "31.151753";
 
           if (self.searchType == 0) {
             // 起点

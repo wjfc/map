@@ -41,7 +41,7 @@ module.exports = {
         changeOrigin: true //是否跨域
       },
       "/Message": {
-        target: "http://112.25.130.117:10040",
+        target: "https://app.smartwj.net:10001",
         changeOrigin: true //是否跨域
       },
       "/fgw": {

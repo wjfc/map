@@ -266,7 +266,7 @@ export default {
                 var obj = {
                   title: "公交通知",
                   text: "公交即将到站，请尽快赶到车站乘车！",
-                  toUserId: this.userid || "406451624106001384"
+                  toUserId: this.userid || "398483532575933416"
                 };
                 apis.sendMsg2(obj, function(res) {
                   self.totastContent = "添加报站成功，请注意查询！";
@@ -278,7 +278,7 @@ export default {
                 var obj = {
                   title: "公交通知",
                   text: "公交已经到站了，请注意抓紧时间乘车！",
-                  toUserId: this.userid || "406451624106001384"
+                  toUserId: this.userid || "398483532575933416"
                 };
                 apis.sendMsg2(obj, function(res) {
                   self.totastContent = "添加报站成功，请注意查询！";

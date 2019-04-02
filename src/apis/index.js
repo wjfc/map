@@ -5,7 +5,7 @@ import baseConstant from "../constant/index.js";
 var instance = axios.create({});
 // 获取公交路线规划详情
 var getRoutesInfo = function(params, callback) {
-  var url = "/v3/direction/transit/integrated";
+  var url = "https://restapi.amap.com/v3/direction/transit/integrated";
   instance
     .get(url, {
       params: params
@@ -16,7 +16,7 @@ var getRoutesInfo = function(params, callback) {
 };
 // 获取步行路线规划
 var getWalkingInfo = function(params, callback) {
-  var url = "/v3/direction/walking";
+  var url = "https://restapi.amap.com/v3/direction/walking";
   instance
     .get(url, {
       params: params
@@ -27,7 +27,7 @@ var getWalkingInfo = function(params, callback) {
 };
 // 高德模糊搜索接口
 var searchByKeyword = function(params, callback) {
-  var url = "/v3/assistant/inputtips";
+  var url = "https://restapi.amap.com/v3/assistant/inputtips";
   instance
     .get(url, {
       params: params
@@ -210,7 +210,7 @@ var sendMsg2 = function(obj, callback) {
   var params = {
     appId: baseConstant.mesAppid,
     messageType: "text",
-    pushChannel: 2,
+    // pushChannel: 1,
     text: obj.text,
     title: obj.title,
     toUserId: obj.toUserId
