@@ -91,6 +91,7 @@ export default {
           size: new AMap.Size(12, 12)
           // 选用的图片尺寸
         });
+        // 将公交的坐标转换为高德的左边
         var _transedV = utils.transLocation.gcj_encrypt(v.lat, v.lon); //注意顺序，使用插件的顺序
         var marker = new AMap.Marker({
           position: new AMap.LngLat(_transedV.lon, _transedV.lat),
@@ -140,11 +141,12 @@ export default {
         size: new AMap.Size(48, 48)
         // 选用的图片尺寸
       });
+      var _transedV = utils.transLocation.gcj_encrypt(
+        this.steps[this.stepIndex].lat,
+        this.steps[this.stepIndex].lon
+      ); //注意顺序，使用插件的顺序
       this.activeMark = new AMap.Marker({
-        position: new AMap.LngLat(
-          this.steps[this.stepIndex].lon,
-          this.steps[this.stepIndex].lat
-        ),
+        position: new AMap.LngLat(_transedV.lon, _transedV.lat),
         offset: new AMap.Pixel(-24, -24),
         icon: markIcon,
         zoom: 13,
