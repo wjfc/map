@@ -23,6 +23,7 @@
 
 <script>
 import apis from "@/apis/index.js";
+import utils from "@/utils/index.js";
 import baseConstant from "@/constant/index.js";
 import basicHeader from "@/components/basicHeader"; //通用头部组件
 import mapComponent from "@/components/mapComponent"; //地图组件
@@ -78,6 +79,7 @@ export default {
       });
     },
     //绘制点标记
+    //需要进行坐标转换
     addMark() {
       var self = this;
       var markArr = [];
@@ -89,8 +91,9 @@ export default {
           size: new AMap.Size(12, 12)
           // 选用的图片尺寸
         });
+        var _transedV = utils.transLocation.gcj_encrypt(v.lat, v.lon); //注意顺序，使用插件的顺序
         var marker = new AMap.Marker({
-          position: new AMap.LngLat(v.lon, v.lat),
+          position: new AMap.LngLat(_transedV.lon, _transedV.lat),
           offset: new AMap.Pixel(-6, -6),
           icon: markIcon,
           zoom: 13,
@@ -109,7 +112,8 @@ export default {
     drawBusLines() {
       var busPath = [];
       this.steps.forEach((v, i) => {
-        busPath.push([v.lon, v.lat]);
+        var _transedV = utils.transLocation.gcj_encrypt(v.lat, v.lon); //注意顺序，使用插件的顺序
+        busPath.push([_transedV.lon, _transedV.lat]);
       });
       var busLine = new AMap.Polyline({
         path: busPath,

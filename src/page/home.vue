@@ -85,6 +85,7 @@ export default {
     this.ggjt_list();
   },
   methods: {
+    // 搜索附件的公交站台
     searchStation() {
       var self = this;
       if (!this.$store.state.location_now) {
@@ -93,9 +94,14 @@ export default {
         var origin = this.$store.state.location_now;
       }
       this.origin = origin;
+      // 将高德定位的转换为公交定位的坐标。
+      var _transedV = utils.transLocation.gcj_decrypt(
+        origin.split(",")[1],
+        origin.split(",")[0]
+      ); //注意顺序，使用插件的顺序，插件使用为lat,lon
       var params = {
-        lon: origin.split(",")[0],
-        lat: origin.split(",")[1],
+        lon: _transedV.lon,
+        lat: _transedV.lat,
         range: 500
       };
       apis.searchStationByRange(params, function(res) {
@@ -138,11 +144,13 @@ export default {
         }
 
         // 将 icon 传入 marker
+        // 将公交接口的定位坐标，转换为高德坐标
+        var _transedV = utils.transLocation.gcj_encrypt(
+          this.stationMark[i].lat,
+          this.stationMark[i].lon
+        ); //注意顺序，使用插件的顺序
         var startMarker = new AMap.Marker({
-          position: new AMap.LngLat(
-            this.stationMark[i].lon,
-            this.stationMark[i].lat
-          ),
+          position: new AMap.LngLat(_transedV.lon, _transedV.lat),
           icon: startIcon,
           offset: new AMap.Pixel(-15, -20)
         });
@@ -189,10 +197,12 @@ export default {
       // 获取步行路线
       var self = this;
       // 显示步行导航路线
-      var destination =
-        this.stationMark[this.stationInfo.dataIndex].lon +
-        "," +
-        this.stationMark[this.stationInfo.dataIndex].lat;
+      // 将公交接口的定位坐标，转换为高德坐标
+      var _transedV = utils.transLocation.gcj_encrypt(
+        this.stationMark[this.stationInfo.dataIndex].lat,
+        this.stationMark[this.stationInfo.dataIndex].lon
+      ); //注意顺序，使用插件的顺序
+      var destination = _transedV.lon + "," + _transedV.lat;
       var params = {
         origin: this.origin,
         destination: destination,
