@@ -247,7 +247,7 @@ var sendMsg2 = function(obj, callback) {
 };
 
 var callBusWarn = function(params, callback) {
-  var url = "/fgw/interfaces/bus/callBusWarn";
+  var url = "/interfaces/bus/callBusWarn";
   instance
     .get(url, {
       params: params

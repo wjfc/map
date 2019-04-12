@@ -33,19 +33,19 @@ module.exports = {
         changeOrigin: true //是否跨域
       },
       "/ggjt": {
-        target: "https://gjcx.smartwj.net:8999",
+        target: "https://app.smartwj.net:10030",
         changeOrigin: true //是否跨域
       },
       "/service": {
-        target: "https://dtopen.smartwj.net:6002",
+        target: "https://app.smartwj.net:10030",
         changeOrigin: true //是否跨域
       },
       "/Message": {
         target: "https://app.smartwj.net:10001",
         changeOrigin: true //是否跨域
       },
-      "/fgw": {
-        target: "https://gjcx.smartwj.net:8999",
+      "/interfaces": {
+        target: "https://app.smartwj.net:10030",
         changeOrigin: true //是否跨域
       }
     },

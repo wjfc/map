@@ -167,7 +167,7 @@ export default {
       }
       this.findBusInfo_timer = setInterval(() => {
         self.findBusInfo();
-      }, 10000);
+      }, 30000);
     },
     //
     // 跳转到公交线路地图详情页面
