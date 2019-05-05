@@ -56,7 +56,7 @@ export default {
       showFriend_tips: true,
       dataFrom: "home",
       showChannel: false,
-      showFriend_tips: true,
+      showFriend_tips: false, //是否展示友好提示框
       stationInfo: {}, //站台信息
       stationMark: [], //获取到的点标记数据
       stationIcon: [], //高德描点图标数组

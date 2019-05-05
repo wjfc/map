@@ -114,7 +114,8 @@ export default {
       lname: this.$route.query.lname,
       lguid: this.$route.query.lguid,
       isMain: this.$route.query.isMain,
-      focusIndex: this.$route.query.focusIndex
+      focusIndex: this.$route.query.focusIndex,
+      slno: this.$route.query.slno || ""
     };
 
     this.msg = this.options.name;
@@ -160,6 +161,9 @@ export default {
       this.stationList.forEach((v, i) => {
         v.busIcon = false;
       });
+      if (this.options.slno) {
+        this.statinonIndex = Number(this.options.slno) - 1;
+      }
       this.findBusInfo();
       if (this.findBusInfo_timer) {
         clearInterval(this.findBusInfo_timer);
@@ -209,7 +213,6 @@ export default {
     // 点击站台获得焦点状态
     stationFocus(v, i) {
       this.statinonIndex = i;
-
       var slno = v.slno;
       var lastArr = [];
       this.busLastSlon.forEach((v, i) => {
@@ -307,25 +310,24 @@ export default {
             lastArr.push(slno - v);
           }
         });
-        if (lastArr.length > 0) {
-          var yubaoNum = Math.min.apply(null, lastArr);
-          if (yubaoNum > 0 && yubaoNum <= 1) {
-            self.totastContent = "车辆即将到达本站！";
-            self.totastMaskShow = true;
-          } else {
-            var params = {
-              lguid: lguid,
-              destIndex: slno,
-              forecastNumber: 2,
-              userId: this.userid
-            };
-            apis.callBusWarn(params, function(res) {
-              if (res.data.message == "success") {
-                self.totastContent = "设置成功！";
-                self.totastMaskShow = true;
-              }
-            });
-          }
+        var yubaoNum = Math.min.apply(null, lastArr);
+
+        if (yubaoNum > 0 && yubaoNum <= 1) {
+          self.totastContent = "车辆即将到达本站！";
+          self.totastMaskShow = true;
+        } else {
+          var params = {
+            lguid: lguid,
+            destIndex: slno,
+            forecastNumber: 2,
+            userId: this.userid || "398483532575933416"
+          };
+          apis.callBusWarn(params, function(res) {
+            if (res.data.message == "success") {
+              self.totastContent = "设置成功！";
+              self.totastMaskShow = true;
+            }
+          });
         }
       }
     }

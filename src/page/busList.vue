@@ -699,6 +699,7 @@ export default {
   width: 100%;
   height: 250px;
   padding: 44px 0;
+  border-bottom: 2px solid #ccc;
   box-sizing: border-box;
 }
 /* 路线详情结束 */

@@ -401,7 +401,8 @@ export default {
             lname: temp.lname,
             lguid: temp.lguid,
             isMain: temp.isMain,
-            focusIndex: ""
+            focusIndex: "",
+            slno: temp.slno
           }
         });
       } else {

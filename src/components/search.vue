@@ -97,10 +97,20 @@ export default {
           var historyList = [];
           var records = res.data.records;
           records.forEach((v, i) => {
-            v.name = v.lname + "路" + "(" + v.ldirection + ")";
-            // 定义特殊id值wjgj，表明是吴江的公交线路
-            v.id = "wjgj";
-            historyList.push(v);
+            console.log(v);
+            var isAdd = true;
+            for (var j = 0; j < historyList.length; j++) {
+              if (historyList[j].name == v.lname + "路") {
+                isAdd = false;
+                return false;
+              }
+            }
+            if (isAdd) {
+              v.name = v.lname + "路";
+              // 定义特殊id值wjgj，表明是吴江的公交线路
+              v.id = "wjgj";
+              historyList.push(v);
+            }
           });
           self.historyList = historyList;
           if (self.historyList.length > 0) {
