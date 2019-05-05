@@ -44,9 +44,11 @@
         <p @click="fillInput(v,i)">{{v.name}}</p>
       </li>
     </ul>
-    <div class="routes" v-show="!showSearchResult">
-      <div v-for="(v,i) in transits" :key="i" @click="goBusMap(i)" class="listbox">
-        <basicList :v="v"></basicList>
+    <div class="routesBox">
+      <div class="routes" v-show="!showSearchResult">
+        <div v-for="(v,i) in transits" :key="i" @click="goBusMap(i)" class="listbox">
+          <basicList :v="v"></basicList>
+        </div>
       </div>
     </div>
 
@@ -681,16 +683,20 @@ export default {
 }
 
 /* 路线详情 */
-.routes {
-  /* margin-top: 18px; */
+.routesBox {
   position: absolute;
-  /* top: 176px; */
   top: 346px;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 0 30px;
+  padding: 0 15px;
+  box-sizing: border-box;
+  background: #eee;
+}
+.routes {
+  position: relative;
   width: 100%;
+  height: 100%;
   box-sizing: border-box;
   overflow: scroll;
   -webkit-overflow-scrolling: touch;
@@ -698,9 +704,14 @@ export default {
 .routes .listbox {
   width: 100%;
   height: 250px;
-  padding: 44px 0;
-  border-bottom: 2px solid #ccc;
+  padding: 44px 15px;
   box-sizing: border-box;
+  margin-top: 15px;
+  background: #fff;
+  border-radius: 6px;
+}
+.routes .listbox:last-child {
+  margin-bottom: 15px;
 }
 /* 路线详情结束 */
 /* 谷歌改变光标颜色 */
