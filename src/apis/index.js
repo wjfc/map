@@ -40,6 +40,21 @@ var searchByKeyword = function(params, callback) {
     });
 };
 
+// 高德逆地理接口
+var searchRege = function(params, callback) {
+  var url = "https://restapi.amap.com/v3/geocode/regeo";
+  instance
+    .get(url, {
+      params: params
+    })
+    .then(function(res) {
+      callback(res);
+    })
+    .catch(function(error) {
+      callback(error);
+    });
+};
+
 /**
  *吴江公交相关接口
  *
@@ -270,6 +285,7 @@ export default {
   getWalkingInfo: getWalkingInfo,
   searchByKeyword: searchByKeyword,
   searchStationByRange: searchStationByRange,
+  searchRege: searchRege,
   findChannelBySguids: findChannelBySguids,
   matchChannel: matchChannel,
   findBusInfo: findBusInfo,

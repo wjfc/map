@@ -124,8 +124,7 @@ export default {
       name: decodeURI(this.$route.query.name),
       title: "线路推荐",
       address: decodeURI(this.$route.query.address),
-      location: this.$route.query.location,
-      id: this.$route.query.id
+      location: this.$route.query.location
     };
     // 处理搜索记录只显示地点，不显示公交线路
     var searchHistory = localStorage.getItem("searchStorage");

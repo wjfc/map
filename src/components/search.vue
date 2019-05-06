@@ -97,7 +97,6 @@ export default {
           var historyList = [];
           var records = res.data.records;
           records.forEach((v, i) => {
-            console.log(v);
             var isAdd = true;
             for (var j = 0; j < historyList.length; j++) {
               if (historyList[j].name == v.lname + "路") {
@@ -182,8 +181,7 @@ export default {
           query: {
             name: encodeURI(v.name),
             address: encodeURI(v.address),
-            location: v.location,
-            id: v.id
+            location: v.location
           }
         });
       } else if (v.id == "wjgj") {

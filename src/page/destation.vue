@@ -1,6 +1,6 @@
 <template>
   <div class="destation">
-    <basicHeader :desName="options.name"></basicHeader>
+    <basicHeader :desName="msg"></basicHeader>
     <mapComponent class="mapComponent2" ref="mapObj" :dataFLag="false"></mapComponent>
     <div class="walking-tips" v-show="walkingTips" @click="closeWalkingTips">路程较短建议步行!</div>
     <div class="tips">
@@ -25,7 +25,7 @@ export default {
   name: "destation",
   data() {
     return {
-      msg: "目的地导向地图",
+      msg: "目的地",
       options: {},
       walkingTips: false,
       walkingTime: null
@@ -34,7 +34,7 @@ export default {
   created() {},
   mounted() {
     var self = this;
-
+    // decodeURI(this.$route.query.name)
     this.options = {
       name: decodeURI(this.$route.query.name),
       address: decodeURI(this.$route.query.address),
@@ -61,7 +61,7 @@ export default {
         key: baseConstant.key,
         city: baseConstant.adname
       };
-      console.log(params);
+
       apis.getRoutesInfo(params, function(res) {
         if (res.data.route.transits.length > 0) {
           self.$router.push({
@@ -69,8 +69,7 @@ export default {
             query: {
               name: encodeURI(self.options.name),
               address: encodeURI(self.options.address),
-              location: self.options.location,
-              id: self.options.id
+              location: self.options.location
             }
           });
         } else {

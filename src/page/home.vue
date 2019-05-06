@@ -30,6 +30,18 @@
         @click="goNotice(newestMessage.id)"
       >{{newestMessage.title}}</div>
     </div>
+    <div class="destation" v-if="touchResult&&showTouchPos">
+      <div class="tips">
+        <div class="tips-l">
+          <p>{{touchResult.formatted_address}}</p>
+          <p>{{touchResult.addressComponent.streetNumber.street+touchResult.addressComponent.streetNumber.number}}</p>
+        </div>
+        <div class="tips-r" @click="goDestation()">
+          <p class="icon-wj_ic_onfoot"></p>
+          <p>去这里</p>
+        </div>
+      </div>
+    </div>
     <!-- 友情提示 -->
     <div class="tips-firendly" v-show="showFriend_tips">
       <div class="tips-box">
@@ -55,7 +67,10 @@ export default {
       code: null,
       showFriend_tips: true,
       dataFrom: "home",
-      showChannel: false,
+      showTouchPos: false, //展示长按接口展示框
+      touchMark: null, //长按描点数据
+      touchResult: null, //长按后的数据结果
+      showChannel: false, //是否展示公交站点详情框
       showFriend_tips: false, //是否展示友好提示框
       stationInfo: {}, //站台信息
       stationMark: [], //获取到的点标记数据
@@ -66,7 +81,8 @@ export default {
       newestMessage: null, //通知公告
       currentMarkIndex: 0, //当前点击状态的索引
       lastMarkIndex: 0, //上一个点击状态的索引
-      noRead: true //判断没有读取过最新的资讯信息
+      noRead: true, //判断没有读取过最新的资讯信息
+      touchTime: 0
     };
   },
   created() {},
@@ -83,6 +99,7 @@ export default {
     }, 3000);
     this.getUserid();
     this.ggjt_list();
+    // this.mapListener(); //监听地图长按事件
   },
   methods: {
     // 搜索附件的公交站台
@@ -259,11 +276,6 @@ export default {
     clearWalkingPath() {
       this.$refs.mapObj.map.remove(this.walkLine);
     },
-    // 绘制起点和终点
-    drawStartAndEnd() {
-      // 绘制起点
-      // 绘制终点
-    },
     // 获取通知公告
     ggjt_list() {
       var self = this;
@@ -321,6 +333,67 @@ export default {
     },
     closeFriend_tips() {
       this.showFriend_tips = false;
+    },
+    mapListener() {
+      var self = this;
+      this.$refs.mapObj.map.on("touchstart", function(ev) {
+        self.showTouchPos = false;
+        self.showChannel = false;
+        if (self.touchMark) {
+          self.clearTouchIcon();
+        }
+        self.touchTime = new Date().getTime();
+      });
+      this.$refs.mapObj.map.on("touchend", function(ev) {
+        var tempTime = new Date().getTime();
+        if (tempTime - self.touchTime > 500) {
+          //  定义大于500毫秒，算长按
+          // 可以拿到经纬度信息,然后根据经纬度去描点以及，调用接口获取该坐标的详情信息。
+          var posX = ev.lnglat.getLng();
+          var poxY = ev.lnglat.getLat();
+          var params = {
+            key: baseConstant.key,
+            location: posX + "," + poxY
+          };
+          apis.searchRege(params, function(res) {
+            var result = res.data.regeocode;
+            var address = result.formatted_address;
+
+            self.touchResult = result;
+            self.showTouchPos = true;
+            console.log(self.touchResult);
+            self.drawTouchIcon(posX, poxY);
+          });
+        }
+      });
+    },
+    goDestation() {
+      var location = touchResult.addressComponent.streetNumber.location;
+      console.log();
+    },
+    drawTouchIcon(x, y) {
+      if (this.touchMark) {
+        this.clearTouchIcon();
+      }
+      var startIcon = new AMap.Icon({
+        // 图标尺寸
+        size: new AMap.Size(29, 39),
+        // 图标的取图地址
+        image: "./static/images/mark0.png",
+        // 根据所设置的大小拉伸或压缩图片
+        imageSize: new AMap.Size(29, 39)
+        // 图标取图偏移量
+      });
+      this.touchMark = new AMap.Marker({
+        position: new AMap.LngLat(x, y),
+        icon: startIcon,
+        offset: new AMap.Pixel(-15, -20)
+      });
+      this.$refs.mapObj.map.add(this.touchMark);
+    },
+    clearTouchIcon() {
+      this.$refs.mapObj.map.remove(this.touchMark);
+      this.touchMark = null;
     }
   },
   components: {
@@ -517,4 +590,46 @@ export default {
 }
 
 /* 更改左下角默认样式  */
+/* 长按目的展示样式 */
+.destation .tips {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 720px;
+  height: 208px;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  background: #fff;
+  border-radius: 16px;
+  z-index: 999999;
+}
+.tips-l {
+  margin-left: 40px;
+}
+.tips-l p:first-child {
+  font-size: 32px;
+  color: #000;
+  margin-bottom: 20px;
+}
+.tips-l p:last-child {
+  font-size: 24px;
+  color: #999999;
+}
+.tips-r {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 40px;
+  color: #37cabe;
+}
+.tips-r p:first-child {
+  font-size: 72px;
+}
+.tips-r p:last-child {
+  font-size: 24px;
+}
+/* 长按目的展示样式结束 */
 </style>
