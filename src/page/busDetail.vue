@@ -308,6 +308,7 @@ export default {
     //
     findBusInfo(obj) {
       var slno = obj.slno;
+
       var url = "/wjtran/busInfo/find?lguids=" + obj.lguid;
       var records = [];
       var lastArr = [];

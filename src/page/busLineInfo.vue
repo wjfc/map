@@ -193,16 +193,18 @@ export default {
       var params = {
         lguids: this.busList[this.activeIndex].lguid
       };
-      this.stationList.forEach((v, i) => {
+      self.stationList.forEach((v, i) => {
         v.busIcon = false;
       });
       apis.findBusInfo(params, ({ data }) => {
         var records = data.records;
         records.forEach((v, i) => {
           busLastSlon.push(v.lastSlno);
-          self.$set(self.stationList[v.lastSlno - 1], "busIcon", true);
+          self.stationList[v.lastSlno - 1] &&
+            self.$set(self.stationList[v.lastSlno - 1], "busIcon", true);
         });
-        this.busLastSlon = busLastSlon;
+
+        self.busLastSlon = busLastSlon;
         self.$forceUpdate();
       });
     },
