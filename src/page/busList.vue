@@ -45,13 +45,13 @@
       </li>
     </ul>
     <div class="routesBox">
-      <div class="routes" v-show="!showSearchResult">
+      <div class="routes" v-show="!showSearchResult&&transits.length>0">
         <div v-for="(v,i) in transits" :key="i" @click="goBusMap(i)" class="listbox">
           <basicList :v="v"></basicList>
         </div>
       </div>
     </div>
-
+    <div class="nosearch" v-if="transits.length<1">暂无搜索结果哟~</div>
     <!-- 加载中 -->
     <div class="loading" v-show="showLoading">
       <p>{{loadingText}}</p>
@@ -165,7 +165,6 @@ export default {
       this.showLoading = true;
       this.loadingText = "正在努力加载中...";
       this.showSearchResult = false;
-
       var params = {
         origin: this.origin.location, //起点位置定位
         destination: this.destination.location, //终点位置定位
@@ -175,7 +174,11 @@ export default {
       };
       this.typeIndex = i;
       apis.getRoutesInfo(params, function(res) {
-        self.showRoutes(res.data.route.transits);
+        if ((res.data.info = "OK") && res.data.route) {
+          self.showRoutes(res.data.route.transits);
+        } else {
+          self.showRoutes([]);
+        }
         self.showLoading = false;
       });
     },
@@ -713,6 +716,13 @@ export default {
   margin-bottom: 15px;
 }
 /* 路线详情结束 */
+.nosearch {
+  position: absolute;
+  bottom: 176px;
+  width: 100%;
+  text-align: center;
+  font-size: 30px;
+}
 /* 谷歌改变光标颜色 */
 input {
   color: #333;

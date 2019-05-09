@@ -2,7 +2,7 @@
   <div class="destation">
     <basicHeader :desName="msg"></basicHeader>
     <mapComponent class="mapComponent2" ref="mapObj" :dataFLag="false"></mapComponent>
-    <div class="walking-tips" v-show="walkingTips" @click="closeWalkingTips">路程较短建议步行!</div>
+    <div class="walking-tips" v-show="walkingTips" @click="closeWalkingTips">{{tipsInfo}}</div>
     <div class="tips">
       <div class="tips-l">
         <p>{{options.name}}</p>
@@ -28,23 +28,23 @@ export default {
       msg: "目的地",
       options: {},
       walkingTips: false,
+      tipsInfo: "路程较短建议步行!",
+      touchMark: null, //长按描点数据
       walkingTime: null
     };
   },
   created() {},
   mounted() {
     var self = this;
-    // decodeURI(this.$route.query.name)
     this.options = {
       name: decodeURI(this.$route.query.name),
       address: decodeURI(this.$route.query.address),
-      location: this.$route.query.location,
-      id: this.$route.query.id
+      location: this.$route.query.location
     };
     setTimeout(function() {
-      // self.$refs.mapObj.addMark(self.$route.query.location);
       self.addMark(self.$route.query.location);
     }, 500);
+    this.mapListener();
   },
   methods: {
     busList() {
@@ -61,18 +61,23 @@ export default {
         key: baseConstant.key,
         city: baseConstant.adname
       };
-
       apis.getRoutesInfo(params, function(res) {
-        if (res.data.route.transits.length > 0) {
-          self.$router.push({
-            path: "/busList",
-            query: {
-              name: encodeURI(self.options.name),
-              address: encodeURI(self.options.address),
-              location: self.options.location
-            }
-          });
+        if (res.data.info == "OK") {
+          if (res.data.route.transits.length > 0) {
+            self.$router.push({
+              path: "/busList",
+              query: {
+                name: encodeURI(self.options.name),
+                address: encodeURI(self.options.address),
+                location: self.options.location
+              }
+            });
+          } else {
+            self.tipsInfo = "路程较短建议步行!";
+            self.showWalkTips();
+          }
         } else {
+          self.tipsInfo = "路程较远，无公交方案提供！";
           self.showWalkTips();
         }
       });
@@ -84,7 +89,10 @@ export default {
         image: "./static/images/endIcon.png", // Icon的图像
         imageSize: new AMap.Size(29, 35) // 根据所设置的大小拉伸或压缩图片
       });
-      var marker = new AMap.Marker({
+      if (this.touchMark) {
+        this.clearTouchIcon();
+      }
+      this.touchMark = new AMap.Marker({
         position: new AMap.LngLat(
           location.split(",")[0],
           location.split(",")[1]
@@ -95,8 +103,12 @@ export default {
         zoom: 13,
         map: this.map
       });
-      this.$refs.mapObj.map.add([marker]);
-      this.$refs.mapObj.map.setFitView([marker]);
+      this.$refs.mapObj.map.add([this.touchMark]);
+      this.$refs.mapObj.map.setFitView([this.touchMark]);
+    },
+    clearTouchIcon() {
+      this.$refs.mapObj.map.remove(this.touchMark);
+      this.touchMark = null;
     },
     // 路程较短时的展示
     showWalkTips() {
@@ -114,6 +126,43 @@ export default {
       clearInterval(this.walkingTime);
       this.walkingTime = null;
       this.walkingTips = false;
+    },
+    mapListener() {
+      var self = this;
+      this.$refs.mapObj.map.on("touchstart", function(ev) {
+        self.touchTime = new Date().getTime();
+      });
+      this.$refs.mapObj.map.on("touchend", function(ev) {
+        var tempTime = new Date().getTime();
+        if (tempTime - self.touchTime > 500) {
+          //  定义大于500毫秒，算长按
+          // 可以拿到经纬度信息,然后根据经纬度去描点以及，调用接口获取该坐标的详情信息。
+          var posX = ev.lnglat.getLng();
+          var poxY = ev.lnglat.getLat();
+          var params = {
+            key: baseConstant.key,
+            location: posX + "," + poxY
+          };
+          apis.searchRege(params, function(res) {
+            var result = res.data.regeocode;
+            var address = result.formatted_address;
+            var province = result.addressComponent.province;
+            var city = result.addressComponent.city;
+            var addressName = result.formatted_address.replace(province, "");
+            addressName = addressName.replace(city, "");
+            result.addressNum =
+              result.addressComponent.streetNumber.street +
+              result.addressComponent.streetNumber.number;
+
+            self.options = {
+              name: decodeURI(addressName),
+              address: decodeURI(result.addressNum),
+              location: params.location
+            };
+            self.addMark(params.location);
+          });
+        }
+      });
     }
   },
   computed: {},
@@ -157,12 +206,12 @@ export default {
   margin-left: 40px;
 }
 .tips-l p:first-child {
-  font-size: 40px;
+  font-size: 32px;
   color: #000;
   margin-bottom: 20px;
 }
 .tips-l p:last-child {
-  font-size: 26px;
+  font-size: 24px;
   color: #999999;
 }
 .tips-r {

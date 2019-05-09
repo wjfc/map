@@ -34,7 +34,7 @@
       <div class="tips">
         <div class="tips-l">
           <p>{{touchResult.formatted_address}}</p>
-          <p>{{touchResult.addressComponent.streetNumber.street+touchResult.addressComponent.streetNumber.number}}</p>
+          <p>{{touchResult.addressNum}}</p>
         </div>
         <div class="tips-r" @click="goDestation()">
           <p class="icon-wj_ic_onfoot"></p>
@@ -99,7 +99,7 @@ export default {
     }, 3000);
     this.getUserid();
     this.ggjt_list();
-    // this.mapListener(); //监听地图长按事件
+    this.mapListener(); //监听地图长按事件
   },
   methods: {
     // 搜索附件的公交站台
@@ -339,6 +339,8 @@ export default {
       this.$refs.mapObj.map.on("touchstart", function(ev) {
         self.showTouchPos = false;
         self.showChannel = false;
+        document.querySelectorAll(".amap-geolocation-con")[0].style.display =
+          "block";
         if (self.touchMark) {
           self.clearTouchIcon();
         }
@@ -358,18 +360,35 @@ export default {
           apis.searchRege(params, function(res) {
             var result = res.data.regeocode;
             var address = result.formatted_address;
-
+            var province = result.addressComponent.province;
+            var city = result.addressComponent.city;
+            var addressName = result.formatted_address.replace(province, "");
+            addressName = addressName.replace(city, "");
+            result.formatted_address = addressName;
+            result.addressNum =
+              result.addressComponent.streetNumber.street +
+              result.addressComponent.streetNumber.number;
             self.touchResult = result;
             self.showTouchPos = true;
-            console.log(self.touchResult);
+            document.querySelectorAll(
+              ".amap-geolocation-con"
+            )[0].style.display = "none";
             self.drawTouchIcon(posX, poxY);
           });
         }
       });
     },
     goDestation() {
-      var location = touchResult.addressComponent.streetNumber.location;
-      console.log();
+      var location = this.touchResult.addressComponent.streetNumber.location;
+
+      this.$router.push({
+        path: "/destation",
+        query: {
+          name: encodeURI(this.touchResult.formatted_address),
+          address: encodeURI(this.touchResult.addressNum),
+          location: location
+        }
+      });
     },
     drawTouchIcon(x, y) {
       if (this.touchMark) {
@@ -379,7 +398,7 @@ export default {
         // 图标尺寸
         size: new AMap.Size(29, 39),
         // 图标的取图地址
-        image: "./static/images/mark0.png",
+        image: "./static/images/endIcon.png",
         // 根据所设置的大小拉伸或压缩图片
         imageSize: new AMap.Size(29, 39)
         // 图标取图偏移量
@@ -613,6 +632,13 @@ export default {
   font-size: 32px;
   color: #000;
   margin-bottom: 20px;
+  display: -webkit-box;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 .tips-l p:last-child {
   font-size: 24px;
