@@ -13,7 +13,7 @@
         "axios": "^0.18.0",
         "babel-polyfill": "^6.26.0",
         "crypto-js": "^3.1.9-1",
-        "jquery": "^3.3.1",
+        "jquery": "^3.5.0",
         "lib-flexible": "^0.3.2",
         "px2rem-loader": "^0.1.9",
         "vconsole": "^3.3.0",
