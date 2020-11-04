@@ -2,7 +2,7 @@
   <div class="mapBox">
     <div class="map" id="mapApp"></div>
     <div class="mapError" v-if="mapErrorFlag" @click="refreshMap">
-      <img src="../../static/images/networkError.png" alt>
+      <img src="../../static/images/networkError.png" alt />
     </div>
   </div>
 </template>
@@ -17,7 +17,7 @@ export default {
       msg: "地图",
       map: {}, //高德地图对象,
       showFlags: this.dataFLag,
-      mapErrorFlag: true
+      mapErrorFlag: true,
     };
   },
   mounted() {
@@ -29,7 +29,7 @@ export default {
     mapInit() {
       this.map = new AMap.Map("mapApp", {
         zoom: 13,
-        resizeEnable: true
+        resizeEnable: true,
       });
       this.mapErrorFlag = false;
       this.map.setCity(baseConstant.adname); //定位到城市。
@@ -39,7 +39,7 @@ export default {
       //   // 如果是主页，则调用吴江公交，搜索最近的车站接口
       //   self.$emit("wjtran_search");
       // }
-      AMap.plugin(["AMap.ToolBar", "AMap.Geolocation"], function() {
+      AMap.plugin(["AMap.ToolBar", "AMap.Geolocation"], function () {
         var toolbar = new AMap.ToolBar({});
         self.map.addControl(toolbar);
         var geolocation = new AMap.Geolocation({
@@ -55,11 +55,11 @@ export default {
             //自定义定位点样式，同Marker的Options
             offset: new AMap.Pixel(-16, -16),
             content:
-              '<img src="./static/images/location.png" style="width:36px;height:36px" id="locationIcon"/>'
+              '<img src="./static/images/location.png" style="width:36px;height:36px" id="locationIcon"/>',
           },
           showCircle: false, //定位成功后用圆圈表示定位精度范围，默认：true
           panToLocation: self.showFlags, //定位成功后将定位到的位置作为地图中心点，默认：true
-          zoomToAccuracy: self.showFlags //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+          zoomToAccuracy: self.showFlags, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
         });
         self.map.addControl(geolocation);
         geolocation.getCurrentPosition(); // 调用高德定位方法。
@@ -90,7 +90,7 @@ export default {
           .getElementsByClassName("amap-geolocation-con")[0]
           .addEventListener(
             "click",
-            function() {
+            function () {
               geolocation.options.panToLocation = true;
               geolocation.options.zoomToAccuracy = true;
               geolocation.getCurrentPosition();
@@ -104,8 +104,8 @@ export default {
     },
     refreshMap() {
       window.location.reload();
-    }
-  }
+    },
+  },
 };
 </script>
 

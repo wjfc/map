@@ -1,11 +1,15 @@
 <template>
   <div class="road" id="road">
-    <mapComponent class="mapComponent2" ref="mapObj" :dataFLag="false"></mapComponent>
+    <mapComponent
+      class="mapComponent2"
+      ref="mapObj"
+      :dataFLag="false"
+    ></mapComponent>
     <header>
       <div class="destation">
         <div class="backArrow icon-wj_ic_back" @click="goBack()"></div>
-        <p>{{options.title}}</p>
-        <img src="../../static/images/home2.png" alt @click="home()">
+        <p>{{ options.title }}</p>
+        <img src="../../static/images/home2.png" alt @click="home()" />
       </div>
       <div class="searchRoutes">
         <div class="startInput inputBox">
@@ -16,7 +20,7 @@
             v-model.trim="searchStart"
             @input="submitSearch(0)"
             @focus="inputFocus(0)"
-          >
+          />
         </div>
         <div class="endInput inputBox">
           <i class="icon-coordinate"></i>
@@ -26,35 +30,42 @@
             v-model.trim="searchEnd"
             @input="submitSearch(1)"
             @focus="inputFocus(1)"
-          >
+          />
         </div>
         <div class="switchDirection" @click="switchDirection"></div>
       </div>
       <ul class="strategy" v-show="!showSearchResult">
         <li
-          :class="{'focus':i===typeIndex}"
-          v-for="(item,i) in strategy"
+          :class="{ focus: i === typeIndex }"
+          v-for="(item, i) in strategy"
           :key="i"
           @click="getRoutes(i)"
-        >{{item.name}}</li>
+        >
+          {{ item.name }}
+        </li>
       </ul>
     </header>
     <ul class="searchLists" v-if="showSearchResult">
-      <li class="listItem" v-for="(v,i) in searchResultList" :key="i">
-        <p @click="fillInput(v,i)">{{v.name}}</p>
+      <li class="listItem" v-for="(v, i) in searchResultList" :key="i">
+        <p @click="fillInput(v, i)">{{ v.name }}</p>
       </li>
     </ul>
     <div class="routesBox">
-      <div class="routes" v-show="!showSearchResult&&transits.length>0">
-        <div v-for="(v,i) in transits" :key="i" @click="goBusMap(i)" class="listbox">
+      <div class="routes" v-show="!showSearchResult && transits.length > 0">
+        <div
+          v-for="(v, i) in transits"
+          :key="i"
+          @click="goBusMap(i)"
+          class="listbox"
+        >
           <basicList :v="v"></basicList>
         </div>
       </div>
     </div>
-    <div class="nosearch" v-if="transits.length<1">暂无搜索结果哟~</div>
+    <div class="nosearch" v-if="transits.length < 1">暂无搜索结果哟~</div>
     <!-- 加载中 -->
     <div class="loading" v-show="showLoading">
-      <p>{{loadingText}}</p>
+      <p>{{ loadingText }}</p>
       <div class="loadEffect">
         <span></span>
         <span></span>
@@ -67,7 +78,9 @@
       </div>
     </div>
     <!-- 提示起点和终点一样 -->
-    <div class="sameDirection" v-show="showSameDirection">{{showSameText}}</div>
+    <div class="sameDirection" v-show="showSameDirection">
+      {{ showSameText }}
+    </div>
   </div>
 </template>
 
@@ -92,20 +105,20 @@ export default {
       strategy: [
         {
           name: "推荐",
-          type: 1
+          type: 1,
         },
         {
           name: "步行少",
-          type: 3
+          type: 3,
         },
         {
           name: "少换乘",
-          type: 2
+          type: 2,
         },
         {
           name: "不坐地铁",
-          type: 5
-        }
+          type: 5,
+        },
       ],
       transits: [], //高德返回路线数组
       currentLocation: "",
@@ -116,7 +129,7 @@ export default {
       searchStart: "", //起点双向数据绑定
       searchEnd: "", //终点双向数据绑定
       showSearchResult: false, //显示搜索结果，默认为false
-      searchResultList: [] //搜索结果列表
+      searchResultList: [], //搜索结果列表
     };
   },
   mounted() {
@@ -124,17 +137,17 @@ export default {
       name: decodeURI(this.$route.query.name),
       title: "线路推荐",
       address: decodeURI(this.$route.query.address),
-      location: this.$route.query.location
+      location: this.$route.query.location,
     };
     // 处理搜索记录只显示地点，不显示公交线路
     var searchHistory = localStorage.getItem("searchStorage");
     if (searchHistory) {
       searchHistory = JSON.parse(searchHistory);
-      this.searchStorage = searchHistory.filter(function(v) {
+      this.searchStorage = searchHistory.filter(function (v) {
         return v.id != "wjgj";
       });
       this.searchStorage.unshift({
-        name: "我的位置"
+        name: "我的位置",
       });
       this.searchStart = "我的位置";
       this.searchEnd = this.options.name;
@@ -146,17 +159,17 @@ export default {
     }
     this.origin = {
       name: "我的位置",
-      location: origin
+      location: origin,
     };
     this.destination = {
       name: this.searchEnd,
-      location: this.options.location
+      location: this.options.location,
     };
     this.getRoutes(this.typeIndex);
   },
   components: {
     basicList,
-    mapComponent
+    mapComponent,
   },
   methods: {
     ...mapMutations(["changeNowLocation"]),
@@ -170,10 +183,10 @@ export default {
         destination: this.destination.location, //终点位置定位
         key: baseConstant.key,
         city: baseConstant.adname,
-        strategy: this.strategy[i].type
+        strategy: this.strategy[i].type,
       };
       this.typeIndex = i;
-      apis.getRoutesInfo(params, function(res) {
+      apis.getRoutesInfo(params, function (res) {
         if ((res.data.info = "OK") && res.data.route) {
           self.showRoutes(res.data.route.transits);
         } else {
@@ -196,9 +209,9 @@ export default {
         city: baseConstant.adcode,
         citylimit: true,
         // 15000:交通相关  19000:地名相关
-        type: "15000|"
+        type: "15000|",
       };
-      apis.searchByKeyword(params, function(res) {
+      apis.searchByKeyword(params, function (res) {
         var result = [];
         if (!res.data) {
           this.searchResultList = [];
@@ -212,7 +225,7 @@ export default {
             }
           });
           result.unshift({
-            name: "我的位置"
+            name: "我的位置",
           });
           self.searchResultList = result;
         }
@@ -279,7 +292,7 @@ export default {
     // 获取当前位置信息
     getCurrentLocation() {
       var self = this;
-      AMap.plugin(["AMap.Geolocation"], function() {
+      AMap.plugin(["AMap.Geolocation"], function () {
         var geolocation = new AMap.Geolocation({
           enableHighAccuracy: true, //是否使用高精度定位，默认:true
           timeout: 10000, //超过10秒后停止定位，默认：无穷大
@@ -293,11 +306,11 @@ export default {
             //自定义定位点样式，同Marker的Options
             offset: new AMap.Pixel(-16, -16),
             content:
-              '<img src="./static/images/location.png" style="width:36px;height:36px" id="locationIcon"/>'
+              '<img src="./static/images/location.png" style="width:36px;height:36px" id="locationIcon"/>',
           },
           showCircle: false, //定位成功后用圆圈表示定位精度范围，默认：true
           panToLocation: false, //定位成功后将定位到的位置作为地图中心点，默认：true
-          zoomToAccuracy: false //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+          zoomToAccuracy: false, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
         });
         geolocation.getCurrentPosition(); // 调用高德定位方法。
         AMap.event.addListener(geolocation, "complete", onComplete); //返回定位信息
@@ -313,13 +326,13 @@ export default {
             // 起点
             self.origin = {
               name: "我的位置",
-              location: self.currentLocation
+              location: self.currentLocation,
             };
             self.searchStart = self.origin.name;
           } else {
             self.destination = {
               name: "我的位置",
-              location: self.currentLocation
+              location: self.currentLocation,
             };
             self.searchStart = self.destination.name;
           }
@@ -382,7 +395,7 @@ export default {
     },
     home() {
       this.$router.push({
-        path: "/"
+        path: "/",
       });
     },
     // 点击跳转到公交地图页面
@@ -396,13 +409,13 @@ export default {
           origin: this.origin.location, //起始位置
           location: this.destination.location, //目的地
           type: this.strategy[this.typeIndex].type,
-          focusIndex: i
-        }
+          focusIndex: i,
+        },
       });
-    }
+    },
   },
 
-  filters: {}
+  filters: {},
 };
 </script>
 

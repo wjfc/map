@@ -3,33 +3,33 @@
     <transcode class="transCode"></transcode>
     <div class="buslines-header">
       <basicHeader :desName="msg"></basicHeader>
-      <div class="buslines-swiper" v-show="busList.length>0">
+      <div class="buslines-swiper" v-show="busList.length > 0">
         <swiper
           :options="swiperOption"
           ref="mySwiper"
           @slideChangeTransitionEnd="slideChangeTransitionEnd"
         >
           <!-- slides -->
-          <swiper-slide v-for="(v,i) in busList" :key="i">
+          <swiper-slide v-for="(v, i) in busList" :key="i">
             <div class="listbox">
               <div class="list-item">
                 <div class="direction">
-                  <span>{{v.station[0].sname}}</span>
+                  <span>{{ v.station[0].sname }}</span>
                   <i class="icon-wj_ic_diraction"></i>
-                  <span>{{v.station[v.station.length-1].sname}}</span>
+                  <span>{{ v.station[v.station.length - 1].sname }}</span>
                 </div>
                 <div class="bustimes">
                   <div>
-                    <img src="../../static/images/start.png" alt>
-                    <span>{{v.lfstdftime}}</span>
+                    <img src="../../static/images/start.png" alt />
+                    <span>{{ v.lfstdftime }}</span>
                   </div>
                   <div>
-                    <img src="../../static/images/end.png" alt>
-                    <span>{{v.lfstdetime}}</span>
+                    <img src="../../static/images/end.png" alt />
+                    <span>{{ v.lfstdetime }}</span>
                   </div>
                   <div v-if="v.station[0].price">
                     <span>.</span>
-                    <span>票价{{v.station[0].price}}元</span>
+                    <span>票价{{ v.station[0].price }}元</span>
                   </div>
                 </div>
               </div>
@@ -37,7 +37,7 @@
                 <mapPreview></mapPreview>
               </div>
               <div class="yubao" @click="callAlarme">
-                <img src="../../static/images/yubao.png" alt>
+                <img src="../../static/images/yubao.png" alt />
               </div>
             </div>
           </swiper-slide>
@@ -49,18 +49,18 @@
     <div class="buslines-content">
       <ul>
         <li
-          v-for="(v,i) in stationList"
+          v-for="(v, i) in stationList"
           :key="i"
-          :class="{hasBusIcon:v.busIcon,active:statinonIndex === i}"
-          @click="stationFocus(v,i)"
+          :class="{ hasBusIcon: v.busIcon, active: statinonIndex === i }"
+          @click="stationFocus(v, i)"
         >
-          <p :class="{active:statinonIndex === i}">{{v.sname}}</p>
+          <p :class="{ active: statinonIndex === i }">{{ v.sname }}</p>
         </li>
       </ul>
     </div>
     <div class="buslines-totast-mask" v-show="totastMaskShow">
       <div class="buslines-totast">
-        <p>{{totastContent}}</p>
+        <p>{{ totastContent }}</p>
         <div @click="closeTotastMaskShow">知道了</div>
       </div>
     </div>
@@ -91,10 +91,10 @@ export default {
         // some swiper options/callbacks
         // 所有的参数同 swiper 官方 api 参数
         pagination: {
-          el: ".swiper-pagination"
+          el: ".swiper-pagination",
         },
 
-        activeIndex: 0
+        activeIndex: 0,
       },
       busList: [], //公交车双向列表
       stationList: [], //站的列表
@@ -103,7 +103,7 @@ export default {
       totastMaskShow: false,
       totastContent: "",
       findBusInfo_timer: null, //开始定时器找寻线路上的所有车辆
-      busLastSlon: [] //线路上所有公交车停靠的站台位置索引
+      busLastSlon: [], //线路上所有公交车停靠的站台位置索引
     };
   },
   mounted() {
@@ -115,7 +115,7 @@ export default {
       lguid: this.$route.query.lguid,
       isMain: this.$route.query.isMain,
       focusIndex: this.$route.query.focusIndex,
-      slno: this.$route.query.slno || ""
+      slno: this.$route.query.slno || "",
     };
 
     this.msg = this.options.name;
@@ -134,11 +134,11 @@ export default {
       var self = this;
       var params = {
         lname: this.options.lname,
-        includeStation: true
+        includeStation: true,
       };
-      apis.findChannelBySguids(params, function(res) {
+      apis.findChannelBySguids(params, function (res) {
         self.busList = res.data.records;
-        self.busList = self.busList.filter(v => {
+        self.busList = self.busList.filter((v) => {
           return v.lname == params.lname;
         });
         if (!self.activeIndex) {
@@ -150,7 +150,7 @@ export default {
           });
         }
         self.getStationList();
-        self.swiper.slideTo(self.activeIndex, 0, function() {});
+        self.swiper.slideTo(self.activeIndex, 0, function () {});
       });
     },
     // 获取站台列表
@@ -171,7 +171,7 @@ export default {
       }
       this.findBusInfo_timer = setInterval(() => {
         self.findBusInfo();
-      }, 30000);
+      }, 10000);
     },
     //
     // 跳转到公交线路地图详情页面
@@ -181,8 +181,8 @@ export default {
         query: {
           lname: this.options.lname,
           lguid: this.busList[this.activeIndex].lguid,
-          focusIndex: i
-        }
+          focusIndex: i,
+        },
       });
     },
     // 获取线路公交详情
@@ -191,7 +191,7 @@ export default {
       var busLastSlon = [];
       var new_stationList = self.stationList;
       var params = {
-        lguids: this.busList[this.activeIndex].lguid
+        lguids: this.busList[this.activeIndex].lguid,
       };
       self.stationList.forEach((v, i) => {
         v.busIcon = false;
@@ -258,7 +258,7 @@ export default {
           clearInterval(this.yubaoTimer);
           this.yubaoTimer = null;
         } else {
-          this.yubaoTimer = setInterval(function() {
+          this.yubaoTimer = setInterval(function () {
             var lastArr = [];
             self.busLastSlon.forEach((v, i) => {
               if (v <= slno) {
@@ -271,9 +271,9 @@ export default {
                 var obj = {
                   title: "公交通知",
                   text: "公交即将到站，请尽快赶到车站乘车！",
-                  toUserId: this.userid || "398483532575933416"
+                  toUserId: this.userid || "398483532575933416",
                 };
-                apis.sendMsg2(obj, function(res) {
+                apis.sendMsg2(obj, function (res) {
                   self.totastContent = "添加报站成功，请注意查询！";
                   self.totastMaskShow = true;
                   clearInterval(self.yubaoTimer);
@@ -283,9 +283,9 @@ export default {
                 var obj = {
                   title: "公交通知",
                   text: "公交已经到站了，请注意抓紧时间乘车！",
-                  toUserId: this.userid || "398483532575933416"
+                  toUserId: this.userid || "398483532575933416",
                 };
-                apis.sendMsg2(obj, function(res) {
+                apis.sendMsg2(obj, function (res) {
                   self.totastContent = "添加报站成功，请注意查询！";
                   self.totastMaskShow = true;
                   clearInterval(self.yubaoTimer);
@@ -322,9 +322,9 @@ export default {
             lguid: lguid,
             destIndex: slno,
             forecastNumber: 2,
-            userId: this.userid || "398483532575933416"
+            userId: this.userid || "398483532575933416",
           };
-          apis.callBusWarn(params, function(res) {
+          apis.callBusWarn(params, function (res) {
             if (res.data.message == "success") {
               self.totastContent = "设置成功！";
               self.totastMaskShow = true;
@@ -332,7 +332,7 @@ export default {
           });
         }
       }
-    }
+    },
   },
   components: {
     basicHeader,
@@ -340,13 +340,13 @@ export default {
     swiperSlide,
     basicList,
     mapPreview,
-    transcode
+    transcode,
   },
   computed: {
     swiper() {
       return this.$refs.mySwiper.swiper;
-    }
-  }
+    },
+  },
 };
 </script>
 
